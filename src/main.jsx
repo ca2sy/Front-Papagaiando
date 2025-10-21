@@ -10,6 +10,8 @@ import CriarPerfil from "./CriarPerfil";
 import CategoriasPage from "./Categorias"; 
 import BotoesPage from "./Botoes";
 import EditarPerfil from "./EditarPerfil";  
+import CriarCategoria from "./CriarCategoria";
+import CriarBotao from "./CriarBotao";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -22,6 +24,8 @@ createRoot(document.getElementById("root")).render(
         <Route path="/perfil/:perfilId/categorias" element={<CategoriasPage />} />
         <Route path="/perfil/:perfilId/categoria/:categoriaId" element={<BotoesPage />} />
         <Route path="/editar-perfil/:perfilId" element={<EditarPerfil />} />
+        <Route path="/criar-categoria/:perfilId" element={<CriarCategoria />} />
+        <Route path="/criar-botao/:perfilId" element={<CriarBotao />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>

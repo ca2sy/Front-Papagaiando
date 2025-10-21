@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import papagaiandoImg from "./img/papagaiando.jpg";
 
 export default function MeusPerfis() {
   const [perfis, setPerfis] = useState([]);
@@ -35,40 +36,81 @@ export default function MeusPerfis() {
   }, []);
 
   if (loading) {
-    return <p className="text-center mt-10">Carregando perfis...</p>;
+    return (
+      <div className="min-h-screen bg-[#67B5DF] flex items-center justify-center">
+        <p className="text-white text-xl">Carregando perfis...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-200 to-blue-300 p-6">
-      <h1 className="text-3xl font-bold mb-6 text-center text-blue-900">Meus Perfis</h1>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {perfis.map((perfil) => (
-          <div
-            key={perfil.id}
-            className="bg-white rounded-2xl shadow-lg p-4 flex flex-col items-center cursor-pointer hover:shadow-xl transition" 
-            onClick={() => navigate(`/perfil/${perfil.id}/categorias`)}
-          >
-            <img
-              src={perfil.urlFoto}
-              alt={perfil.nome}
-              className="w-24 h-24 rounded-full mb-4 object-cover"
-            />
-            <p className="font-semibold text-blue-900 text-lg">{perfil.nome}</p>
-          </div>
-        ))}
-
-        {perfis.length < 3 && (
-          <div
-            className="bg-white rounded-2xl shadow-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:shadow-xl transition"
-            onClick={() => navigate("/criar-perfil")}
-          >
-            <div className="w-24 h-24 rounded-full flex items-center justify-center bg-blue-100 mb-4 text-blue-600 text-3xl font-bold">
-              +
+    <div className="min-h-screen bg-[#67B5DF]">
+      {/* Header Compacto */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-3">
+            <div className="flex items-center">
+              <img 
+                src={papagaiandoImg} 
+                alt="Papagaiando" 
+                className="h-8 w-auto"
+              />
+              <span className="ml-2 text-xl font-bold text-[#004687]">Papagaiando</span>
             </div>
-            <p className="font-semibold text-blue-900">Adicionar Perfil</p>
           </div>
-        )}
+        </div>
+      </header>
+
+      {/* Conteúdo Centralizado */}
+      <div className="flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6">
+        {/* Título */}
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 sm:mb-3">Quem está usando?</h1>
+          <p className="text-white/80 text-sm sm:text-base">Selecione um perfil para começar</p>
+        </div>
+
+        {/* Grid de Perfis - Responsivo */}
+        <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center items-center gap-6 sm:gap-10 max-w-3xl mx-auto w-full">
+          {perfis.map((perfil) => (
+            <div
+              key={perfil.id}
+              className="flex flex-col items-center cursor-pointer group w-full sm:w-auto"
+              onClick={() => navigate(`/perfil/${perfil.id}/categorias`)}
+            >
+              {/* Avatar Circular - Aumentado */}
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-transparent group-hover:border-white transition-all duration-300 mb-3 sm:mb-4 overflow-hidden shadow-2xl">
+                <img
+                  src={perfil.urlFoto}
+                  alt={perfil.nome}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+              {/* Nome do Perfil */}
+              <p className="text-white text-base sm:text-lg font-medium group-hover:text-white/90 transition-colors text-center">
+                {perfil.nome}
+              </p>
+            </div>
+          ))}
+
+          {/* Botão Adicionar Perfil */}
+          {perfis.length < 3 && (
+            <div
+              className="flex flex-col items-center cursor-pointer group w-full sm:w-auto"
+              onClick={() => navigate("/criar-perfil")}
+            >
+              {/* Círculo de Adicionar - Aumentado */}
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-dashed border-white/50 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-white group-hover:bg-white/10 transition-all duration-300">
+                <div className="text-white text-4xl sm:text-5xl font-light group-hover:scale-110 transition-transform">
+                  +
+                </div>
+              </div>
+              {/* Texto */}
+              <p className="text-white/70 text-base sm:text-lg font-medium group-hover:text-white transition-colors text-center">
+                Adicionar Perfil
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

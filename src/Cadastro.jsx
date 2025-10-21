@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Cadastro() {
   const [form, setForm] = useState({
@@ -9,7 +9,7 @@ export default function Cadastro() {
     senha: "",
   });
 
-  const navigate = useNavigate(); // <-- inicializa o navigate
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -37,10 +37,8 @@ export default function Cadastro() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("token", data.token); // <-- salva o token
         alert("Cadastro realizado com sucesso!");
-        navigate("/login"); // <-- redireciona para Meus Perfis
+        navigate("/");
       } else {
         const errorData = await response.json();
         alert("Erro ao cadastrar: " + (errorData.message || "Tente novamente."));
@@ -52,73 +50,93 @@ export default function Cadastro() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-200 to-blue-300">
-      <div className="bg-blue-550/90 backdrop-blur-md p-10 rounded-3xl shadow-2xl w-full max-w-md text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-blue-600/30 rounded-3xl -z-10" />
-
-        <h1 className="text-4xl font-extrabold text-center mb-8 text-blue-900">
-          Cadastro 
+    <div className="flex items-center justify-center min-h-screen bg-[#67B5DF] p-4">
+      <div className="bg-white backdrop-blur-md p-6 rounded-2xl shadow-xl w-full max-w-sm">
+        <h1 className="text-2xl font-bold text-center mb-4 text-[#004687]">
+          Cadastro
         </h1>
-        <form onSubmit={handleSubmit} className="space-y-5">
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-base font-medium mb-1 text-blue-900">Nome</label>
+            <label className="block text-sm font-medium mb-1 text-[#004687]">
+              Nome
+            </label>
             <input
               type="text"
               name="nome"
               value={form.nome}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg bg-blue-100 text-blue-900 placeholder-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#67B5DF] bg-white text-sm"
               placeholder="Digite seu nome"
               required
             />
           </div>
 
           <div>
-            <label className="block text-base font-medium mb-1 text-blue-900">Sobrenome do responsável</label>
+            <label className="block text-sm font-medium mb-1 text-[#004687]">
+              Sobrenome
+            </label>
             <input
               type="text"
               name="sobrenome"
               value={form.sobrenome}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg bg-blue-100 text-blue-900 placeholder-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#67B5DF] bg-white text-sm"
               placeholder="Digite o sobrenome"
               required
             />
           </div>
 
           <div>
-            <label className="block text-base font-medium mb-1 text-blue-900">Email do responsável</label>
+            <label className="block text-sm font-medium mb-1 text-[#004687]">
+              Email
+            </label>
             <input
               type="email"
               name="email"
               value={form.email}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg bg-blue-100 text-blue-900 placeholder-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#67B5DF] bg-white text-sm"
               placeholder="exemplo@email.com"
               required
             />
           </div>
 
           <div>
-            <label className="block text-base font-medium mb-1 text-blue-900">Senha</label>
+            <label className="block text-sm font-medium mb-1 text-[#004687]">
+              Senha
+            </label>
             <input
               type="password"
               name="senha"
               value={form.senha}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg bg-blue-100 text-blue-900 placeholder-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300"
-              placeholder="Crie uma senha"
+              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#67B5DF] bg-white text-sm"
+              placeholder="Mínimo 8 caracteres"
               required
             />
+            <p className="text-xs text-[#67B5DF] mt-1">
+              Mínimo de 8 caracteres
+            </p>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-800 text-white font-semibold py-3 rounded-lg hover:bg-blue-900 transition shadow-lg"
+            className="w-full bg-[#004687] text-white font-semibold py-2 rounded-lg hover:bg-[#003366] transition-all duration-200 shadow-md hover:shadow-lg"
           >
             Cadastrar
           </button>
         </form>
+
+        <p className="mt-4 text-center text-[#004687] text-sm">
+          Já tem uma conta?{" "}
+          <Link 
+            to="/" 
+            className="font-semibold underline hover:text-[#67B5DF] transition-colors"
+          >
+            Faça login
+          </Link>
+        </p>
       </div>
     </div>
   );

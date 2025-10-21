@@ -1,8 +1,27 @@
 import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import papagaiandoImg from "../img/papagaiando.jpg";
 
 export default function HeaderPerfil({ perfil, onMenuClick }) {
   const [menuAberto, setMenuAberto] = useState(false);
+  const navigate = useNavigate();
+  const { perfilId } = useParams();
+
+  const handleMenuClick = (acao) => {
+    setMenuAberto(false);
+    
+    if (acao === 'criar-categoria') {
+      navigate(`/criar-categoria/${perfilId}`);
+    } else if (acao === 'criar-botao') {
+      navigate(`/criar-botao/${perfilId}`);
+    } else if (acao === 'editar-perfil') {
+      navigate(`/editar-perfil/${perfilId}`);
+    } else if (acao === 'sair') {
+      navigate(`/meus-perfis`);
+    } else {
+      onMenuClick(acao);
+    }
+  };
 
   return (
     <header className="bg-white shadow-sm">
@@ -33,25 +52,25 @@ export default function HeaderPerfil({ perfil, onMenuClick }) {
             {menuAberto && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                 <button 
-                  onClick={() => { setMenuAberto(false); onMenuClick('editar-perfil'); }}
+                  onClick={() => handleMenuClick('editar-perfil')}
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                 >
                   Editar Perfil
                 </button>
                 <button 
-                  onClick={() => { setMenuAberto(false); onMenuClick('criar-botao'); }}
+                  onClick={() => handleMenuClick('criar-botao')}
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                 >
                   Criar Botão
                 </button>
                 <button 
-                  onClick={() => { setMenuAberto(false); onMenuClick('criar-categoria'); }}
+                  onClick={() => handleMenuClick('criar-categoria')}
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                 >
                   Criar Categoria
                 </button>
                 <button 
-                  onClick={() => { setMenuAberto(false); onMenuClick('sair'); }}
+                  onClick={() => handleMenuClick('sair')}
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                 >
                   Sair do Perfil

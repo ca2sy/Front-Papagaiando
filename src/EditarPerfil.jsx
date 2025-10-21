@@ -99,15 +99,15 @@ export default function EditarPerfil() {
 
   if (carregando) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-200 to-blue-300">
-        <p className="text-xl text-blue-900">Carregando...</p>
+      <div className="flex items-center justify-center min-h-screen bg-[#67B5DF]">
+        <p className="text-xl text-white">Carregando...</p>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-200 to-blue-300 p-4">
-      <div className="bg-blue-400/90 backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-white">
+    <div className="flex items-center justify-center min-h-screen bg-[#67B5DF] p-4">
+      <div className="bg-[#67B5DF] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-white border-2 border-white/30">
         <div className="flex items-center mb-6">
           <button
             onClick={handleVoltar}
@@ -126,7 +126,7 @@ export default function EditarPerfil() {
             placeholder="Nome do perfil"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg text-blue-900 placeholder-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+            className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-white bg-white"
             required
           />
 
@@ -138,7 +138,7 @@ export default function EditarPerfil() {
                 src={img.url}
                 alt={img.nome}
                 className={`w-24 h-24 rounded-xl cursor-pointer border-4 transition-transform transform hover:scale-105 ${
-                  fotoSelecionada === img.url ? "border-blue-500" : "border-gray-400"
+                  fotoSelecionada === img.url ? "border-white" : "border-white/50"
                 }`}
                 onClick={() => setFotoSelecionada(img.url)}
               />
@@ -148,7 +148,7 @@ export default function EditarPerfil() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 transition font-semibold py-3 rounded-lg shadow-lg mt-4"
+            className="w-full bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg mt-4 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {loading ? "Salvando..." : "Salvar Alterações"}
           </button>

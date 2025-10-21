@@ -41,13 +41,7 @@ export default function BotoesPage() {
       
       if (botoesResponse.ok) {
         const todosBotoes = await botoesResponse.json();
-        
-        const botoesComTipo = todosBotoes.map(botao => ({
-          ...botao,
-          tipo: botao.padrao ? 'padrao' : 'personalizado'
-        }));
-        
-        setBotoes(botoesComTipo);
+        setBotoes(todosBotoes);
       } else {
         console.error("Erro ao buscar botões:", botoesResponse.status);
         setBotoes([]);
@@ -138,7 +132,7 @@ export default function BotoesPage() {
     <div className="min-h-screen bg-gradient-to-br from-green-200 to-blue-300">
       <HeaderPerfil perfil={perfil} onMenuClick={handleMenuClick} />
 
-      <div className="p-6 max-w-7xl mx-auto">
+      <div className="p-4 sm:p-6 max-w-7xl mx-auto">
         {/* Cabeçalho */}
         <div className="flex items-center justify-between mb-6">
           <button
@@ -156,9 +150,6 @@ export default function BotoesPage() {
               <h1 className="text-2xl font-bold text-blue-900">
                 {categoria.nome}
               </h1>
-              {categoria.padrao && (
-                <span className="text-sm text-gray-600">Categoria Padrão</span>
-              )}
             </div>
           )}
           
@@ -172,34 +163,30 @@ export default function BotoesPage() {
 
         {/* Grid de botões */}
         {botoes.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
             {botoes.map(botao => (
               <div
                 key={botao.id}
+                className="flex flex-col items-center cursor-pointer group"
                 onClick={() => handleBotaoClick(botao)}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-transform hover:scale-105 aspect-square flex flex-col"
               >
-                <div className="flex-1 overflow-hidden">
+                {/* Botão retangular com imagem */}
+                <div className="w-full aspect-square bg-white rounded-xl shadow-lg overflow-hidden border-2 border-transparent group-hover:border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-xl">
                   <img
                     src={botao.urlImagem}
                     alt={botao.nome}
                     className="w-full h-full object-cover"
                     onError={(e) => { 
-                      e.target.src = "https://via.placeholder.com/200?text=Sem+Imagem"; 
+                      e.target.src = "https://via.placeholder.com/200?text=📻"; 
                     }}
                   />
                 </div>
-
-                <div className="p-3 text-center">
-                  <h3 className="font-bold text-sm text-blue-900 truncate">
+                
+                {/* Nome do botão abaixo da imagem */}
+                <div className="mt-3 text-center w-full">
+                  <h3 className="font-medium text-sm text-blue-900 truncate">
                     {botao.nome}
                   </h3>
-                  {botao.tipo === 'personalizado' && (
-                    <span className="text-xs text-green-600 font-medium">Personalizado</span>
-                  )}
-                  {botao.tipo === 'padrao' && (
-                    <span className="text-xs text-blue-600 font-medium">Padrão</span>
-                  )}
                 </div>
               </div>
             ))}

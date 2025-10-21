@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", senha: "" });
-  const navigate = useNavigate(); // <-- inicializa o navigate
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -31,7 +31,7 @@ export default function Login() {
       localStorage.setItem("userId", data.userId);
       alert(`Bem-vindo, ${data.nome}!`);
 
-      navigate("/meus-perfis"); // <-- redireciona para Meus Perfis
+      navigate("/meus-perfis");
     } catch (err) {
       console.error("Erro na requisição:", err);
       alert("Erro de conexão com o servidor");
@@ -41,7 +41,7 @@ export default function Login() {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
       {/* Lado esquerdo com a imagem (apenas desktop) */}
-      <div className="hidden lg:flex lg:w-1/2 bg-blue-400 items-center justify-center p-4">
+      <div className="hidden lg:flex lg:w-1/2 bg-[#67B5DF] items-center justify-center p-4">
         <img
           src={papagaiandoImg}
           alt="Papagaiando"
@@ -50,33 +50,33 @@ export default function Login() {
       </div>
 
       {/* Lado direito com o formulário de login */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-blue-200 p-4 min-h-screen">
-        <div className="bg-blue-400 backdrop-blur-md p-6 lg:p-10 rounded-3xl shadow-2xl w-full max-w-sm md:max-w-md text-white">
-          <h1 className="text-3xl font-extrabold mb-6 text-center text-white">
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-[#67B5DF] p-4 min-h-screen">
+        <div className="bg-white backdrop-blur-md p-6 lg:p-10 rounded-3xl shadow-2xl w-full max-w-sm md:max-w-md">
+          <h1 className="text-3xl font-extrabold mb-6 text-center text-[#004687]">
             Login
           </h1>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-base font-medium mb-1 text-white">Email</label>
+              <label className="block text-base font-medium mb-1 text-[#004687]">Email</label>
               <input
                 type="email"
                 name="email"
                 value={form.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg text-blue-900 placeholder-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+                className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#67B5DF] bg-white"
                 placeholder="exemplo@email.com"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-base font-medium mb-1 text-white">Senha</label>
+              <label className="block text-base font-medium mb-1 text-[#004687]">Senha</label>
               <input
                 type="password"
                 name="senha"
                 value={form.senha}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg text-blue-900 placeholder-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+                className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#67B5DF] bg-white"
                 placeholder="Senha"
                 required
               />
@@ -84,15 +84,18 @@ export default function Login() {
 
             <button
               type="submit"
-              className="w-full bg-blue-500 text-white font-semibold py-3 rounded-lg hover:bg-blue-600 transition shadow-lg"
+              className="w-full bg-[#004687] text-white font-semibold py-3 rounded-lg hover:bg-[#003366] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
               Entrar
             </button>
           </form>
 
-          <p className="mt-4 text-center text-white">
+          <p className="mt-4 text-center text-[#004687]">
             Ainda não tem uma conta?{" "}
-            <Link to="/cadastro" className="font-semibold underline hover:text-blue-200">
+            <Link 
+              to="/cadastro" 
+              className="font-semibold underline hover:text-[#67B5DF] transition-colors duration-300"
+            >
               Cadastre-se
             </Link>
           </p>

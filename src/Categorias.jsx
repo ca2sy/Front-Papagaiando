@@ -99,9 +99,9 @@ export default function CategoriasPage() {
     <div className="min-h-screen bg-gradient-to-br from-green-200 to-blue-300">
       <HeaderPerfil perfil={perfil} onMenuClick={handleMenuClick} />
 
-      <div className="p-6 max-w-7xl mx-auto">
+      <div className="p-4 sm:p-6 max-w-7xl mx-auto">
         {categorias.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
             {categorias.map(categoria => (
               <CategoriaCard
                 key={categoria.id}
@@ -128,7 +128,7 @@ export default function CategoriasPage() {
   );
 }
 
-// Card de categoria
+
 function CategoriaCard({ categoria, onClick }) {
   return (
     <div
@@ -146,13 +146,10 @@ function CategoriaCard({ categoria, onClick }) {
         />
       </div>
 
-      <div className="p-3 text-center">
-        <h3 className="font-bold text-sm text-blue-900 truncate">
+      <div className="p-2 sm:p-3 text-center">
+        <h3 className="font-bold text-xs sm:text-sm text-blue-900 truncate">
           {categoria.nome}
         </h3>
-        {categoria.isPadrao && (
-          <span className="text-xs text-blue-600 font-medium">Padrão</span>
-        )}
       </div>
     </div>
   );
