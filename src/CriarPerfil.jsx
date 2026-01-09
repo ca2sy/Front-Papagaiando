@@ -63,9 +63,9 @@ export default function CriarPerfil() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#a3cee6] p-4">
-      <div className="bg-[#67B5DF] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-white border-2 border-white/30">
-        <h1 className="text-3xl font-extrabold mb-6 text-center text-white">Criar Perfil</h1>
+    <div className="flex items-center justify-center min-h-screen bg-[#b3daff] p-4">
+      <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-white border-2 border-white/30">
+        <h1 className="text-3xl font-extrabold mb-6 text-center text-[#004687]">Criar Perfil</h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <input
@@ -73,19 +73,19 @@ export default function CriarPerfil() {
             placeholder="Nome do perfil"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-white bg-white"
+            className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-white bg-white border-2 border-[#004687]"
             required
           />
 
-          <p className="text-white font-semibold mt-2">Escolha uma imagem de perfil:</p>
+          <p className="text-[#004687] font-semibold mt-2">Escolha uma imagem de perfil:</p>
           <div className="flex flex-wrap gap-4 justify-center mt-2">
             {imagensPapagaiando.map((img, idx) => (
               <img
                 key={idx}
                 src={img.url}
                 alt={img.nome}
-                className={`w-24 h-24 rounded-xl cursor-pointer border-4 transition-transform transform hover:scale-105 ${
-                  fotoSelecionada === img.url ? "border-white" : "border-white/50"
+                className={`w-24 h-24 rounded-xl cursor-pointer border-2 transition-transform transform hover:scale-105 ${
+                  fotoSelecionada === img.url ? "border-[#004687]" : "border-[#004687]/50"
                 }`}
                 onClick={() => setFotoSelecionada(img.url)}
               />

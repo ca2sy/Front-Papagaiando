@@ -289,13 +289,13 @@ export default function CriarBotao() {
   };
 
   return (
-    <div className="min-h-screen bg-[#67B5DF] p-4">
+    <div className="min-h-screen bg-[#b3daff] p-4">
       <div className="flex items-center justify-center min-h-screen">
-        <div className="bg-[#67B5DF] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-white border-2 border-white/30">
+        <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-[#004687] border-2 border-white/30">
           <div className="flex items-center mb-6">
             <button
               onClick={handleVoltar}
-              className="text-white hover:text-blue-100 mr-4 disabled:opacity-50"
+              className="text-[#004687] hover:text-blue-100 mr-4 disabled:opacity-50"
               disabled={loading || gravando}
             >
               <svg
@@ -317,7 +317,7 @@ export default function CriarBotao() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-base font-medium mb-2 text-white">
+              <label className="block text-base font-medium mb-2 text-[#004687]">
                 Nome do Botão
               </label>
               <input
@@ -325,20 +325,20 @@ export default function CriarBotao() {
                 placeholder="Ex: Gato, Azul, etc."
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-white bg-white"
+                className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-white bg-white border border-[#004687] p-2 rounded"
                 disabled={loading || gravando}
                 required
               />
             </div>
 
             <div>
-              <label className="block text-base font-medium mb-2 text-white">
+              <label className="block text-base font-medium mb-2 text-[#004687]">
                 Categoria
               </label>
               <select
                 value={categoriaSelecionada}
                 onChange={(e) => setCategoriaSelecionada(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg text-[#004687] focus:outline-none focus:ring-2 focus:ring-white bg-white"
+                className="w-full px-4 py-3 rounded-lg text-[#004687] focus:outline-none focus:ring-2 focus:ring-white bg-white border border-[#004687] p-2 rounded"
                 disabled={loading || carregandoCategorias || gravando}
                 required
               >
@@ -355,10 +355,10 @@ export default function CriarBotao() {
             </div>
 
             <div>
-              <label className="block text-base font-medium mb-2 text-white">
+              <label className="block text-base font-medium mb-2 text-[#004687]">
                 Imagem do Botão
               </label>
-              <div className="border-2 border-dashed border-white/50 rounded-lg p-6 text-center cursor-pointer hover:border-white transition">
+              <div className="border-2 border-dashed border-[#004687]/50 rounded-lg p-6 text-center cursor-pointer hover:border-white transition">
                 <input
                   type="file"
                   accept="image/*"
@@ -378,14 +378,14 @@ export default function CriarBotao() {
                         alt="Preview"
                         className="w-32 h-32 object-cover rounded-lg mx-auto"
                       />
-                      <p className="text-sm text-white/80">
+                      <p className="text-sm text-[#004687]/80">
                         Clique para alterar imagem
                       </p>
                     </div>
                   ) : (
                     <div className="space-y-2">
                       <svg
-                        className="mx-auto h-12 w-12 text-white/60"
+                        className="mx-auto h-12 w-12 text-[#004687]/60"
                         stroke="currentColor"
                         fill="none"
                         viewBox="0 0 48 48"
@@ -414,7 +414,7 @@ export default function CriarBotao() {
                       <p className="text-sm font-medium">
                         Clique para fazer upload da imagem
                       </p>
-                      <p className="text-xs text-white/80">
+                      <p className="text-xs text-[#004687]/80">
                         PNG, JPG, GIF até 5MB
                       </p>
                     </div>
@@ -424,12 +424,12 @@ export default function CriarBotao() {
             </div>
 
             <div>
-              <label className="block text-base font-medium mb-2 text-white">
+              <label className="block text-base font-medium mb-2 text-[#004687]">
                 Áudio do Botão
               </label>
               
               {!permissaoAudio && (
-                <div className="bg-red-500/20 border border-red-400 text-white px-4 py-3 rounded-lg text-sm mb-4">
+                <div className="bg-red-500/20 border border-red-400 text-[#004687] px-4 py-3 rounded-lg text-sm mb-4">
                   Permissão de microfone necessária. Por favor, permita o acesso ao microfone no seu navegador.
                 </div>
               )}
@@ -494,7 +494,7 @@ export default function CriarBotao() {
 
                 {/* Alternativa de upload */}
                 <div className="text-center">
-                  <p className="text-sm text-white/80 mb-2">Ou faça upload de um arquivo de áudio</p>
+                  <p className="text-sm text-[#004687]/80 mb-2">Ou faça upload de um arquivo de áudio</p>
                   <input
                     type="file"
                     accept="audio/*"
@@ -524,7 +524,7 @@ export default function CriarBotao() {
             </div>
 
             {erro && (
-              <div className="bg-red-500/20 border border-red-400 text-white px-4 py-3 rounded-lg text-sm">
+              <div className="bg-red-500/20 border border-red-400 text-[#004687] px-4 py-3 rounded-lg text-sm">
                 {erro}
               </div>
             )}

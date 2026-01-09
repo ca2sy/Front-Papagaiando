@@ -120,35 +120,31 @@ export default function CriarCategoria() {
   };
 
   return (
-    <div className="min-h-screen bg-[#67B5DF] p-4">
+    <div className="min-h-screen bg-[#b3daff] p-4">
       <div className="flex items-center justify-center min-h-screen">
-        <div className="bg-[#67B5DF] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-white border-2 border-white/30">
-          <div className="flex items-center mb-6">
-            <button
-              onClick={handleVoltar}
-              className="text-white hover:text-blue-100 mr-4 disabled:opacity-50"
-              disabled={loading}
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-            <h1 className="text-3xl font-extrabold">Criar Categoria</h1>
+        <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-[#004687] border-2 border-white/30">
+          <div className="relative flex items-center justify-center mb-6">
+             <button
+    type="button"
+    onClick={() => window.history.back()}
+    className="absolute left-0 p-2 rounded-full hover:bg-[#004687]/10 transition"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-6 w-6 text-[#004687]"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+    </svg>
+  </button>
+            <h1 className="text-3xl font-bold text-center text-[#004687]">Criar Categoria</h1>
           </div>
-
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-base font-medium mb-2 text-white">
+              <label className="block text-base font-medium mb-2 text-[#004687]">
                 Nome da Categoria
               </label>
               <input
@@ -156,17 +152,17 @@ export default function CriarCategoria() {
                 placeholder="Ex: Animais, Cores, etc."
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-white bg-white"
+                className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#004687] border-2 border-[#004687] focus:outline-none focus:ring-2 focus:ring-white bg-white"
                 disabled={loading}
                 required
               />
             </div>
 
             <div>
-              <label className="block text-base font-medium mb-2 text-white">
+              <label className="block text-base font-medium mb-2 text-[#004687]">
                 Imagem da Categoria
               </label>
-              <div className="border-2 border-dashed border-white/50 rounded-lg p-6 text-center cursor-pointer hover:border-white transition">
+              <div className="border-2 border-dashed border-[#004687] rounded-lg p-6 text-center cursor-pointer hover:border-white transition">
                 <input
                   type="file"
                   accept="image/*"
@@ -186,7 +182,7 @@ export default function CriarCategoria() {
                         alt="Preview"
                         className="w-32 h-32 object-cover rounded-lg mx-auto"
                       />
-                      <p className="text-sm text-white/80">
+                      <p className="text-sm text-[#004687]/80">
                         Clique para alterar imagem
                       </p>
                     </div>
@@ -222,7 +218,7 @@ export default function CriarCategoria() {
                       <p className="text-sm font-medium">
                         Clique para fazer upload da imagem
                       </p>
-                      <p className="text-xs text-white/80">
+                      <p className="text-xs text-[#004687]/80">
                         PNG, JPG, GIF até 5MB
                       </p>
                     </div>

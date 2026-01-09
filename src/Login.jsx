@@ -41,7 +41,7 @@ export default function Login() {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
       {/* Lado esquerdo com a imagem (apenas desktop) */}
-      <div className="hidden lg:flex lg:w-1/2 bg-[#67B5DF] items-center justify-center p-4">
+      <div className="hidden lg:flex lg:w-1/2 bg-[#b3daff] items-center justify-center p-4">
         <img
           src={papagaiandoImg}
           alt="Papagaiando"
@@ -50,7 +50,7 @@ export default function Login() {
       </div>
 
       {/* Lado direito com o formulário de login */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-[#67B5DF] p-4 min-h-screen">
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-[#b3daff] p-4 min-h-screen">
         <div className="bg-white backdrop-blur-md p-6 lg:p-10 rounded-3xl shadow-2xl w-full max-w-sm md:max-w-md">
           <h1 className="text-3xl font-extrabold mb-6 text-center text-[#004687]">
             Login
@@ -63,7 +63,7 @@ export default function Login() {
                 name="email"
                 value={form.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#67B5DF] bg-white"
+                className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#004687] bg-white"
                 placeholder="exemplo@email.com"
                 required
               />
@@ -76,7 +76,7 @@ export default function Login() {
                 name="senha"
                 value={form.senha}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#67B5DF] bg-white"
+                className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#004687] bg-white"
                 placeholder="Senha"
                 required
               />

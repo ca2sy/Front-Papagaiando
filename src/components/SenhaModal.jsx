@@ -91,7 +91,7 @@ export default function SenhaModal({ isOpen, onClose, onConfirm, titulo, mensage
           </button>
           <button 
             onClick={handleConfirmar}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300"
+            className="px-4 py-2 bg-[#004687] text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300"
             disabled={loading}
           >
             {loading ? "Verificando..." : "Confirmar"}

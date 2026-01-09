@@ -18,13 +18,19 @@ export default function HeaderPerfil({ perfil, onMenuClick }) {
       navigate(`/editar-perfil/${perfilId}`);
     } else if (acao === 'sair') {
       navigate(`/meus-perfis`);
+    } else if (acao === 'sair-conta') {
+      // Limpa dados de autenticação
+      localStorage.clear();
+      sessionStorage.clear();
+      // Redireciona para o login
+      navigate('/');
     } else {
       onMenuClick(acao);
     }
   };
 
   return (
-    <header className="bg-white shadow-sm">
+    <header className="bg-[#004280] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center">
@@ -33,7 +39,7 @@ export default function HeaderPerfil({ perfil, onMenuClick }) {
               alt="Papagaiando" 
               className="h-10 w-auto"
             />
-            <span className="ml-2 text-2xl font-bold text-blue-900">Papagaiando</span>
+            <span className="ml-2 text-2xl font-bold text-white">Papagaiando</span>
           </div>
           
           <div className="relative">
@@ -74,6 +80,13 @@ export default function HeaderPerfil({ perfil, onMenuClick }) {
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                 >
                   Sair do Perfil
+                </button>
+                <hr className="my-1" />
+                <button 
+                  onClick={() => handleMenuClick('sair-conta')}
+                  className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left font-medium"
+                >
+                  Sair da Conta
                 </button>
               </div>
             )}

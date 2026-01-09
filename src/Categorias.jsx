@@ -89,14 +89,14 @@ export default function CategoriasPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-200 to-blue-300 flex items-center justify-center">
+      <div className="min-h-screen bg-[#b3daff] flex items-center justify-center">
         <p className="text-xl text-blue-900">Carregando categorias...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-200 to-blue-300">
+    <div className="min-h-screen bg-[#b3daff]">
       <HeaderPerfil perfil={perfil} onMenuClick={handleMenuClick} />
 
       <div className="p-4 sm:p-6 max-w-7xl mx-auto">

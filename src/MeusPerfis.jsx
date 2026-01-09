@@ -37,16 +37,16 @@ export default function MeusPerfis() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#67B5DF] flex items-center justify-center">
+      <div className="min-h-screen bg-[#b3daff] flex items-center justify-center">
         <p className="text-white text-xl">Carregando perfis...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#67B5DF]">
+    <div className="min-h-screen bg-[#b3daff]">
       {/* Header Compacto */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-[#004687] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-3">
             <div className="flex items-center">
@@ -55,7 +55,7 @@ export default function MeusPerfis() {
                 alt="Papagaiando" 
                 className="h-8 w-auto"
               />
-              <span className="ml-2 text-xl font-bold text-[#004687]">Papagaiando</span>
+              <span className="ml-2 text-xl font-bold text-white">Papagaiando</span>
             </div>
           </div>
         </div>
@@ -65,8 +65,8 @@ export default function MeusPerfis() {
       <div className="flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6">
         {/* Título */}
         <div className="text-center mb-8 sm:mb-12">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 sm:mb-3">Quem está usando?</h1>
-          <p className="text-white/80 text-sm sm:text-base">Selecione um perfil para começar</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#004687] mb-2 sm:mb-3">Quem está usando?</h1>
+          <p className="text-[#004687]/80 text-sm sm:text-base">Selecione um perfil para começar</p>
         </div>
 
         {/* Grid de Perfis - Responsivo */}
@@ -78,7 +78,7 @@ export default function MeusPerfis() {
               onClick={() => navigate(`/perfil/${perfil.id}/categorias`)}
             >
               {/* Avatar Circular - Aumentado */}
-              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-transparent group-hover:border-white transition-all duration-300 mb-3 sm:mb-4 overflow-hidden shadow-2xl">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-2 border-[#004687] group-hover:border-white transition-all duration-300 mb-3 sm:mb-4 overflow-hidden shadow-2xl">
                 <img
                   src={perfil.urlFoto}
                   alt={perfil.nome}
@@ -86,7 +86,7 @@ export default function MeusPerfis() {
                 />
               </div>
               {/* Nome do Perfil */}
-              <p className="text-white text-base sm:text-lg font-medium group-hover:text-white/90 transition-colors text-center">
+              <p className="text-[#004687] text-base sm:text-lg font-medium group-hover:text-white/90 transition-colors text-center">
                 {perfil.nome}
               </p>
             </div>
@@ -99,13 +99,13 @@ export default function MeusPerfis() {
               onClick={() => navigate("/criar-perfil")}
             >
               {/* Círculo de Adicionar - Aumentado */}
-              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-dashed border-white/50 flex items-center justify-center mb-3 sm:mb-4 group-hover:border-white group-hover:bg-white/10 transition-all duration-300">
-                <div className="text-white text-4xl sm:text-5xl font-light group-hover:scale-110 transition-transform">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-2 border-[#004687] flex items-center justify-center mb-3 sm:mb-4 group-hover:border-white group-hover:bg-white/10 transition-all duration-300">
+                <div className="text-[#004687] text-4xl sm:text-5xl font-light group-hover:scale-110 transition-transform">
                   +
                 </div>
               </div>
               {/* Texto */}
-              <p className="text-white/70 text-base sm:text-lg font-medium group-hover:text-white transition-colors text-center">
+              <p className="text-[#004687] text-base sm:text-lg font-medium group-hover:text-white transition-colors text-center">
                 Adicionar Perfil
               </p>
             </div>

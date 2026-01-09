@@ -99,19 +99,19 @@ export default function EditarPerfil() {
 
   if (carregando) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#67B5DF]">
-        <p className="text-xl text-white">Carregando...</p>
+      <div className="flex items-center justify-center min-h-screen bg-[#b3daff]">
+        <p className="text-xl text-[#004687]">Carregando...</p>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#67B5DF] p-4">
-      <div className="bg-[#67B5DF] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-white border-2 border-white/30">
+    <div className="flex items-center justify-center min-h-screen bg-[#b3daff] p-4">
+      <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-[#004687] border-2 border-[#004687]/30">
         <div className="flex items-center mb-6">
           <button
             onClick={handleVoltar}
-            className="text-white hover:text-blue-100 mr-4"
+            className="text-[#004687] hover:text-blue-100 mr-4"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -126,11 +126,11 @@ export default function EditarPerfil() {
             placeholder="Nome do perfil"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-white bg-white"
+            className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-white bg-white border-2 border-[#004687]"
             required
           />
 
-          <p className="text-white font-semibold mt-2">Escolha uma imagem de perfil:</p>
+          <p className="text-[#004687] font-semibold mt-2">Escolha uma imagem de perfil:</p>
           <div className="flex flex-wrap gap-4 justify-center mt-2">
             {imagensPapagaiando.map((img, idx) => (
               <img

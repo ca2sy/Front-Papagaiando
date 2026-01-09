@@ -122,14 +122,14 @@ export default function BotoesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-200 to-blue-300 flex items-center justify-center">
+      <div className="min-h-screen bg-[#b3daff] flex items-center justify-center">
         <p className="text-xl text-blue-900">Carregando botões...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-200 to-blue-300">
+    <div className="min-h-screen bg-[#b3daff]">
       <HeaderPerfil perfil={perfil} onMenuClick={handleMenuClick} />
 
       <div className="p-4 sm:p-6 max-w-7xl mx-auto">
@@ -137,7 +137,7 @@ export default function BotoesPage() {
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={handleVoltar}
-            className="flex items-center text-blue-900 hover:text-blue-700 font-medium"
+            className="flex items-center text-blue-900 hover:text-[#004687] font-medium"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -155,7 +155,7 @@ export default function BotoesPage() {
           
           <button
             onClick={() => handleMenuClick("criar-botao")}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
+            className="bg-[#004687] hover:bg-[#003D99] text-white px-4 py-2 rounded-lg font-medium"
           >
             + Botão
           </button>
@@ -198,7 +198,7 @@ export default function BotoesPage() {
             </p>
             <button
               onClick={() => handleMenuClick("criar-botao")}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium"
+              className="bg-blue-600 hover:bg-[#004687] text-white px-6 py-2 rounded-lg font-medium"
             >
               Criar Primeiro Botão
             </button>
