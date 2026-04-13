@@ -1,20 +1,20 @@
-import { StrictMode } from "react";
+
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
 
-import Login from "./Login";
-import Cadastro from "./Cadastro";
-import MeusPerfis from "./MeusPerfis";
-import CriarPerfil from "./CriarPerfil";
-import CategoriasPage from "./Categorias"; 
-import BotoesPage from "./Botoes";
-import EditarPerfil from "./EditarPerfil";  
-import CriarCategoria from "./CriarCategoria";
-import CriarBotao from "./CriarBotao";
+import Login from "./pages/Login/Login";
+import Cadastro from "./pages/Login/Cadastro";
+import MeusPerfis from "./pages/Perfil/MeusPerfis";
+import CriarPerfil from "./pages/Perfil/CriarPerfil";
+import CategoriasPage from "./pages/Categorias/Categorias"; 
+import BotoesPage from "./pages/Botoes/Botoes";
+import EditarPerfil from "./pages/Perfil/EditarPerfil";  
+import CriarCategoria from "./pages/Categorias/CriarCategoria";
+import CriarBotao from "./pages/Botoes/CriarBotao";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
@@ -28,5 +28,5 @@ createRoot(document.getElementById("root")).render(
         <Route path="/criar-botao/:perfilId" element={<CriarBotao />} />
       </Routes>
     </BrowserRouter>
-  </StrictMode>
+
 );

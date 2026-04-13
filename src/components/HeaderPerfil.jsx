@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import papagaiandoImg from "../img/papagaiando.jpg";
+import papagaiandoImg from "../assets/papagaiando.jpg";
 
 export default function HeaderPerfil({ perfil, onMenuClick }) {
   const [menuAberto, setMenuAberto] = useState(false);

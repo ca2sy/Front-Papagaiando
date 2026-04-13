@@ -1,5 +1,5 @@
 import { useState } from "react";
-import papagaiandoImg from "./img/papagaiando.jpg";
+import papagaiandoImg from "../../assets/papagaiando.jpg";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {

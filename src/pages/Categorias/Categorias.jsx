@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import HeaderPerfil from "./components/HeaderPerfil.jsx";
-import SenhaModal from "./components/SenhaModal.jsx";
+import HeaderPerfil from "../../components/HeaderPerfil.jsx"
+import SenhaModal from "../../components/SenhaModal.jsx";
 
 export default function CategoriasPage() {
   const [categorias, setCategorias] = useState([]);

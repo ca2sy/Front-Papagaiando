@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import papagaiandoImg from "./img/papagaiando.jpg";
-
+import papagaiandoImg from "../../assets/papagaiando.jpg"
 export default function MeusPerfis() {
   const [perfis, setPerfis] = useState([]);
   const [loading, setLoading] = useState(true);
