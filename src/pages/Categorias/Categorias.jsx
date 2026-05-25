@@ -1,10 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import HeaderPerfil from "../../components/HeaderPerfil.jsx"
+import HeaderPerfil from "../../components/HeaderPerfil.jsx";
 import SenhaModal from "../../components/SenhaModal.jsx";
+import BotaoFala from "../../components/BotaoFala.jsx";
 
 export default function CategoriasPage() {
   const [categorias, setCategorias] = useState([]);
+  const [favoritos, setFavoritos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [perfil, setPerfil] = useState(null);
   const [showSenhaModal, setShowSenhaModal] = useState(false);
@@ -22,15 +24,19 @@ export default function CategoriasPage() {
       const perfilResponse = await fetch(`http://localhost:8080/perfis/${perfilId}`, {
         headers: { Authorization: "Bearer " + token }
       });
+
       if (perfilResponse.ok) {
         const perfilData = await perfilResponse.json();
         setPerfil(perfilData);
       }
 
-      // Buscar categorias do perfil (isso já traz padrão + personalizadas)
-      const categoriasResponse = await fetch(`http://localhost:8080/categorias/perfil/${perfilId}`, {
-        headers: { Authorization: "Bearer " + token }
-      });
+      // Buscar categorias do perfil
+      const categoriasResponse = await fetch(
+        `http://localhost:8080/categorias/perfil/${perfilId}`,
+        {
+          headers: { Authorization: "Bearer " + token }
+        }
+      );
 
       if (categoriasResponse.ok) {
         const data = await categoriasResponse.json();
@@ -41,6 +47,12 @@ export default function CategoriasPage() {
         }));
 
         setCategorias(categoriasComFlag);
+
+        const favoritosSalvos =
+          JSON.parse(localStorage.getItem("favoritos")) || [];
+
+        setFavoritos(favoritosSalvos);
+
       } else {
         setCategorias([]);
       }
@@ -69,15 +81,19 @@ export default function CategoriasPage() {
       case "editar-perfil":
         navigate(`/editar-perfil/${perfilId}`);
         break;
+
       case "criar-botao":
         navigate(`/criar-botao/${perfilId}`);
         break;
+
       case "criar-categoria":
         navigate(`/criar-categoria/${perfilId}`);
         break;
+
       case "sair":
         navigate("/meus-perfis");
         break;
+
       default:
         break;
     }
@@ -90,16 +106,44 @@ export default function CategoriasPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#b3daff] flex items-center justify-center">
-        <p className="text-xl text-blue-900">Carregando categorias...</p>
+        <p className="text-xl text-blue-900">
+          Carregando categorias...
+        </p>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-[#b3daff]">
-      <HeaderPerfil perfil={perfil} onMenuClick={handleMenuClick} />
+      <HeaderPerfil
+        perfil={perfil}
+        onMenuClick={handleMenuClick}
+      />
 
       <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+
+        {favoritos.length > 0 && (
+          <>
+            <h2 className="text-2xl font-bold text-blue-900 mb-4">
+              Favoritos
+            </h2>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 mb-10">
+              {favoritos.map(botao => (
+                <BotaoFala
+                  key={botao.id}
+                  botao={botao}
+                  onClick={() => {}}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        <h2 className="text-2xl font-bold text-blue-900 mb-4">
+          Categorias
+        </h2>
+
         {categorias.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
             {categorias.map(categoria => (
@@ -128,7 +172,6 @@ export default function CategoriasPage() {
   );
 }
 
-
 function CategoriaCard({ categoria, onClick }) {
   return (
     <div
@@ -140,8 +183,9 @@ function CategoriaCard({ categoria, onClick }) {
           src={categoria.urlImagem}
           alt={categoria.nome}
           className="w-full h-full object-cover"
-          onError={(e) => { 
-            e.target.src = "https://via.placeholder.com/200?text=Sem+Imagem"; 
+          onError={(e) => {
+            e.target.src =
+              "https://via.placeholder.com/200?text=Sem+Imagem";
           }}
         />
       </div>
