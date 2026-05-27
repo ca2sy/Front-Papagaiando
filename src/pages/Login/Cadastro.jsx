@@ -50,7 +50,7 @@ export default function Cadastro() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#67B5DF] p-4">
+    <div className="flex items-center justify-center min-h-screen bg-[#b3daff] p-4">
       <div className="bg-white backdrop-blur-md p-6 rounded-2xl shadow-xl w-full max-w-sm">
         <h1 className="text-2xl font-bold text-center mb-4 text-[#004687]">
           Cadastro
@@ -66,7 +66,7 @@ export default function Cadastro() {
               name="nome"
               value={form.nome}
               onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#67B5DF] bg-white text-sm"
+              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#004687] bg-white text-sm"
               placeholder="Digite seu nome"
               required
             />
@@ -81,7 +81,7 @@ export default function Cadastro() {
               name="sobrenome"
               value={form.sobrenome}
               onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#67B5DF] bg-white text-sm"
+              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#004687] bg-white text-sm"
               placeholder="Digite o sobrenome"
               required
             />
@@ -96,7 +96,7 @@ export default function Cadastro() {
               name="email"
               value={form.email}
               onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#67B5DF] bg-white text-sm"
+              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#004687] bg-white text-sm"
               placeholder="exemplo@email.com"
               required
             />
@@ -111,11 +111,11 @@ export default function Cadastro() {
               name="senha"
               value={form.senha}
               onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#67B5DF] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#67B5DF] bg-white text-sm"
+              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#004687] bg-white text-sm"
               placeholder="Mínimo 8 caracteres"
               required
             />
-            <p className="text-xs text-[#67B5DF] mt-1">
+            <p className="text-xs text-[#004687] mt-1">
               Mínimo de 8 caracteres
             </p>
           </div>
