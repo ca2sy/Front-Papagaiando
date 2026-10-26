@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaPen } from "react-icons/fa";
 
-export default function BotaoFala({ botao, onClick }) {
+export default function BotaoFala({ botao, onClick, onEditar }) {
   const [favoritado, setFavoritado] = useState(false);
 
   useEffect(() => {
@@ -67,12 +67,26 @@ export default function BotaoFala({ botao, onClick }) {
           {botao.nome}
         </h3>
 
-        <button
-          onClick={toggleFavorito}
-          className="ml-2 text-pink-500 text-lg transition-transform hover:scale-110"
-        >
-          {favoritado ? <FaHeart /> : <FaRegHeart />}
-        </button>
+        <div className="flex items-center">
+          {onEditar && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditar(botao);
+              }}
+              className="ml-2 text-blue-900 text-lg transition-transform hover:scale-110"
+            >
+              <FaPen />
+            </button>
+          )}
+
+          <button
+            onClick={toggleFavorito}
+            className="ml-2 text-pink-500 text-lg transition-transform hover:scale-110"
+          >
+            {favoritado ? <FaHeart /> : <FaRegHeart />}
+          </button>
+        </div>
       </div>
     </div>
   );

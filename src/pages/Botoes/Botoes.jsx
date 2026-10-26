@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import HeaderPerfil from "../../components/HeaderPerfil.jsx";
 import SenhaModal from "../../components/SenhaModal.jsx";
 import BotaoFala from "../../components/BotaoFala.jsx";
+import api from "../../services/api";
 
 export default function BotoesPage() {
   const [botoes, setBotoes] = useState([]);
@@ -25,66 +26,31 @@ export default function BotoesPage() {
 
     try {
       // Buscar perfil
-      const perfilResponse = await fetch(
-        `http://localhost:8080/perfis/${perfilId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-
-      if (perfilResponse.ok) {
-        const perfilData = await perfilResponse.json();
-        setPerfil(perfilData);
-      }
+      const perfilResponse = await api.get(`/perfis/${perfilId}`);
+      setPerfil(perfilResponse.data);
 
       // Buscar botões
-      const botoesResponse = await fetch(
-        `http://localhost:8080/botoes/categoria/${categoriaId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+      const botoesResponse = await api.get(
+        `/botoes/categoria/${categoriaId}`,
+        { params: { perfilId } }
       );
-
-      if (botoesResponse.ok) {
-        const todosBotoes = await botoesResponse.json();
-        setBotoes(todosBotoes);
-      } else {
-        console.error(
-          "Erro ao buscar botões:",
-          botoesResponse.status
-        );
-
-        setBotoes([]);
-      }
+      setBotoes(botoesResponse.data);
 
       // Buscar categoria
-      const categoriasResponse = await fetch(
-        `http://localhost:8080/categorias/perfil/${perfilId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+      const categoriasResponse = await api.get(
+        `/categorias/perfil/${perfilId}`
       );
 
-      if (categoriasResponse.ok) {
-        const todasCategorias =
-          await categoriasResponse.json();
+      const categoriaEncontrada =
+        categoriasResponse.data.find(
+          c => c.id === categoriaId
+        );
 
-        const categoriaEncontrada =
-          todasCategorias.find(
-            c => c.id === categoriaId
-          );
-
-        if (categoriaEncontrada) {
-          setCategoria(categoriaEncontrada);
-        } else {
-          console.error(
-            "Categoria não encontrada na lista do perfil"
-          );
-        }
+      if (categoriaEncontrada) {
+        setCategoria(categoriaEncontrada);
       } else {
         console.error(
-          "Erro ao buscar categorias:",
-          categoriasResponse.status
+          "Categoria não encontrada na lista do perfil"
         );
       }
 
@@ -153,6 +119,10 @@ export default function BotoesPage() {
 
   const handleVoltar = () => {
     navigate(`/perfil/${perfilId}/categorias`);
+  };
+
+  const handleEditarBotao = (botao) => {
+    navigate(`/editar-botao/${perfilId}/${botao.id}`);
   };
 
   if (loading) {
@@ -225,6 +195,7 @@ export default function BotoesPage() {
                 key={botao.id}
                 botao={botao}
                 onClick={handleBotaoClick}
+                onEditar={handleEditarBotao}
               />
             ))}
 

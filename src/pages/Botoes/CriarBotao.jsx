@@ -1,11 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { createClient } from "@supabase/supabase-js";
-
-const SUPABASE_URL = "https://bkueynyjbvxuavboqnja.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdWV5bnlqYnZ4dWF2Ym9xbmphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwMzgwNzEsImV4cCI6MjA3MDYxNDA3MX0.c_9cK5NIgi9e-Tf-xRw3gDi2SJbyxPPb8lBj9Usvck0";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import supabase from "../../services/supabase";
+import api from "../../services/api";
 
 export default function CriarBotao() {
   const [nome, setNome] = useState("");
@@ -36,19 +32,8 @@ export default function CriarBotao() {
   useEffect(() => {
     const carregarCategorias = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(`http://localhost:8080/categorias/perfil/${perfilId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setCategorias(data);
-        } else {
-          setErro("Erro ao carregar categorias");
-        }
+        const response = await api.get(`/categorias/perfil/${perfilId}`);
+        setCategorias(response.data);
       } catch (error) {
         console.error("Erro:", error);
         setErro("Erro ao carregar categorias");
@@ -216,32 +201,22 @@ export default function CriarBotao() {
   };
 
   const salvarBotaoBackend = async (urlImagem, urlAudio) => {
-    const token = localStorage.getItem("token");
-
     const payload = {
       nome: nome,
       urlImagem: urlImagem,
       urlAudio: urlAudio,
       categoriaId: categoriaSelecionada,
+      perfilId: perfilId,
     };
 
-    const response = await fetch("http://localhost:8080/botoes/personalizados", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
+    try {
+      const response = await api.post("/botoes/personalizados", payload);
+      return response.data;
+    } catch (error) {
       throw new Error(
-        `Erro ao salvar botão: ${errorData.message || "Tente novamente"}`
+        `Erro ao salvar botão: ${error.response?.data?.message || "Tente novamente"}`
       );
     }
-
-    return await response.json();
   };
 
   const handleSubmit = async (e) => {

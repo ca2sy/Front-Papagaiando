@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
 import papagaiandoImg from "../../assets/papagaiando.jpg"
 export default function MeusPerfis() {
   const [perfis, setPerfis] = useState([]);
@@ -12,20 +13,10 @@ export default function MeusPerfis() {
       if (!token) return;
 
       try {
-        const response = await fetch("http://localhost:8080/perfis/me", {
-          headers: {
-            Authorization: "Bearer " + token,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setPerfis(data);
-        } else {
-          console.error("Erro ao buscar perfis");
-        }
+        const response = await api.get("/perfis/me");
+        setPerfis(response.data);
       } catch (error) {
-        console.error("Erro de conexão:", error);
+        console.error("Erro ao buscar perfis:", error);
       } finally {
         setLoading(false);
       }
@@ -56,6 +47,12 @@ export default function MeusPerfis() {
               />
               <span className="ml-2 text-xl font-bold text-white">Papagaiando</span>
             </div>
+            <button
+              onClick={() => navigate("/minha-conta")}
+              className="text-white font-medium hover:text-[#67B5DF] transition-colors"
+            >
+              Minha Conta
+            </button>
           </div>
         </div>
       </header>

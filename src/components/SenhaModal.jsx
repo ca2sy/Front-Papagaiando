@@ -1,4 +1,5 @@
 import { useState } from "react";
+import api from "../services/api";
 
 export default function SenhaModal({ isOpen, onClose, onConfirm, titulo, mensagem }) {
   const [senha, setSenha] = useState("");
@@ -15,31 +16,16 @@ export default function SenhaModal({ isOpen, onClose, onConfirm, titulo, mensage
     setErro("");
 
     try {
-      const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
-      
-      if (!userId || !token) {
+
+      if (!token) {
         setErro("Sessão expirada. Faça login novamente.");
         setLoading(false);
         return;
       }
 
       // Verificar a senha no backend
-      const response = await fetch("http://localhost:8080/auth/verificar-senha", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({ userId, senha }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        setErro(errorData.error || "Senha incorreta");
-        setLoading(false);
-        return;
-      }
+      await api.post("/auth/verificar-senha", { senha });
 
       // Senha correta
       onConfirm();
@@ -47,7 +33,12 @@ export default function SenhaModal({ isOpen, onClose, onConfirm, titulo, mensage
       setErro("");
     } catch (error) {
       console.error("Erro ao verificar senha:", error);
-      setErro("Erro de conexão com o servidor");
+
+      if (error.response) {
+        setErro(error.response.data?.message || "Senha incorreta");
+      } else {
+        setErro("Erro de conexão com o servidor");
+      }
     }
     
     setLoading(false);

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
 
 export default function CriarPerfil() {
   const [nome, setNome] = useState("");
@@ -23,9 +24,8 @@ export default function CriarPerfil() {
 
     setLoading(true);
     const token = localStorage.getItem("token");
-    const usuarioId = localStorage.getItem("userId");
 
-    if (!token || !usuarioId) {
+    if (!token) {
       alert("Usuário não autenticado. Faça login novamente.");
       setLoading(false);
       navigate("/"); // volta pro login
@@ -33,31 +33,23 @@ export default function CriarPerfil() {
     }
 
     try {
-      const payload = { nome, urlFoto: fotoSelecionada, usuarioId };
-      const response = await fetch("http://localhost:8080/perfis", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify(payload)
-      });
+      const payload = { nome, urlFoto: fotoSelecionada };
+      await api.post("/perfis", payload);
 
-      if (response.ok) {
-        alert("Perfil criado com sucesso!");
-        setNome("");
-        setFotoSelecionada(null);
-        navigate("/meus-perfis"); // volta pra tela de perfis
-      } else if (response.status === 401) {
-        alert("Usuário não autenticado. Faça login novamente.");
-        navigate("/"); // volta pro login
-      } else {
-        const errorData = await response.json();
-        alert("Erro ao criar perfil: " + (errorData.message || "Tente novamente"));
-      }
+      alert("Perfil criado com sucesso!");
+      setNome("");
+      setFotoSelecionada(null);
+      navigate("/meus-perfis"); // volta pra tela de perfis
     } catch (error) {
       console.error("Erro ao criar perfil:", error);
-      alert("Erro ao criar perfil. Tente novamente.");
+
+      if (error.response?.status === 401) {
+        alert("Usuário não autenticado. Faça login novamente.");
+      } else if (error.response) {
+        alert("Erro ao criar perfil: " + (error.response.data?.message || "Tente novamente"));
+      } else {
+        alert("Erro ao criar perfil. Tente novamente.");
+      }
     }
     setLoading(false);
   };

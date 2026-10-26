@@ -1,9 +1,11 @@
 import { useState } from "react";
 import papagaiandoImg from "../../assets/papagaiando.jpg";
 import { Link, useNavigate } from "react-router-dom";
+import api from "../../services/api";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", senha: "" });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -13,20 +15,10 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setLoading(true);
+
     try {
-      const response = await fetch("http://localhost:8080/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert("Erro: " + errorData.error);
-        return;
-      }
-
-      const data = await response.json();
+      const { data } = await api.post("/auth/login", form);
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId);
       alert(`Bem-vindo, ${data.nome}!`);
@@ -34,7 +26,14 @@ export default function Login() {
       navigate("/meus-perfis");
     } catch (err) {
       console.error("Erro na requisição:", err);
-      alert("Erro de conexão com o servidor");
+
+      if (err.response) {
+        alert("Erro: " + (err.response.data?.message || "Tente novamente."));
+      } else {
+        alert("Erro de conexão com o servidor");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,6 +64,7 @@ export default function Login() {
                 onChange={handleChange}
                 className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#004687] bg-white"
                 placeholder="exemplo@email.com"
+                disabled={loading}
                 required
               />
             </div>
@@ -78,17 +78,34 @@ export default function Login() {
                 onChange={handleChange}
                 className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#004687] bg-white"
                 placeholder="Senha"
+                disabled={loading}
                 required
               />
             </div>
 
             <button
               type="submit"
+              disabled={loading}
               className="w-full bg-[#004687] text-white font-semibold py-3 rounded-lg hover:bg-[#003366] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
-              Entrar
+              {loading ? "Entrando..." : "Entrar"}
             </button>
           </form>
+
+          {loading && (
+            <p className="mt-4 text-center text-[#004687] text-sm">
+              Conectando ao servidor, a primeira entrada pode levar até um minuto.
+            </p>
+          )}
+
+          <p className="mt-4 text-center text-[#004687]">
+            <Link
+              to="/esqueci-senha"
+              className="font-semibold underline hover:text-[#67B5DF] transition-colors duration-300"
+            >
+              Esqueceu a senha?
+            </Link>
+          </p>
 
           <p className="mt-4 text-center text-[#004687]">
             Ainda não tem uma conta?{" "}

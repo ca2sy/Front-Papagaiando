@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { createClient } from "@supabase/supabase-js";
-
-const SUPABASE_URL = "https://bkueynyjbvxuavboqnja.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdWV5bnlqYnZ4dWF2Ym9xbmphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwMzgwNzEsImV4cCI6MjA3MDYxNDA3MX0.c_9cK5NIgi9e-Tf-xRw3gDi2SJbyxPPb8lBj9Usvck0";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import supabase from "../../services/supabase";
+import api from "../../services/api";
 
 export default function CriarCategoria() {
   const [nome, setNome] = useState("");
@@ -59,31 +55,20 @@ export default function CriarCategoria() {
   };
 
   const salvarCategoriaBackend = async (urlImagem) => {
-    const token = localStorage.getItem("token");
-
     const payload = {
       nome: nome,
       urlImagem: urlImagem,
       perfilId: perfilId,
     };
 
-    const response = await fetch("http://localhost:8080/categorias", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
+    try {
+      const response = await api.post("/categorias", payload);
+      return response.data;
+    } catch (error) {
       throw new Error(
-        `Erro ao salvar categoria: ${errorData.message || "Tente novamente"}`
+        `Erro ao salvar categoria: ${error.response?.data?.message || "Tente novamente"}`
       );
     }
-
-    return await response.json();
   };
 
   const handleSubmit = async (e) => {
@@ -126,7 +111,7 @@ export default function CriarCategoria() {
           <div className="relative flex items-center justify-center mb-6">
              <button
     type="button"
-    onClick={() => window.history.back()}
+    onClick={handleVoltar}
     className="absolute left-0 p-2 rounded-full hover:bg-[#004687]/10 transition"
   >
     <svg

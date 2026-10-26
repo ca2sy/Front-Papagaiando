@@ -1,8 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { FaPen } from "react-icons/fa";
 import HeaderPerfil from "../../components/HeaderPerfil.jsx";
 import SenhaModal from "../../components/SenhaModal.jsx";
 import BotaoFala from "../../components/BotaoFala.jsx";
+import api from "../../services/api";
 
 export default function CategoriasPage() {
   const [categorias, setCategorias] = useState([]);
@@ -11,6 +13,8 @@ export default function CategoriasPage() {
   const [perfil, setPerfil] = useState(null);
   const [showSenhaModal, setShowSenhaModal] = useState(false);
   const [acaoSelecionada, setAcaoSelecionada] = useState(null);
+  const [busca, setBusca] = useState("");
+  const [resultadoBusca, setResultadoBusca] = useState(null);
 
   const navigate = useNavigate();
   const { perfilId } = useParams();
@@ -21,41 +25,25 @@ export default function CategoriasPage() {
 
     try {
       // Buscar perfil
-      const perfilResponse = await fetch(`http://localhost:8080/perfis/${perfilId}`, {
-        headers: { Authorization: "Bearer " + token }
-      });
-
-      if (perfilResponse.ok) {
-        const perfilData = await perfilResponse.json();
-        setPerfil(perfilData);
-      }
+      const perfilResponse = await api.get(`/perfis/${perfilId}`);
+      setPerfil(perfilResponse.data);
 
       // Buscar categorias do perfil
-      const categoriasResponse = await fetch(
-        `http://localhost:8080/categorias/perfil/${perfilId}`,
-        {
-          headers: { Authorization: "Bearer " + token }
-        }
+      const categoriasResponse = await api.get(
+        `/categorias/perfil/${perfilId}`
       );
 
-      if (categoriasResponse.ok) {
-        const data = await categoriasResponse.json();
+      const categoriasComFlag = categoriasResponse.data.map(c => ({
+        ...c,
+        isPadrao: c.padrao
+      }));
 
-        const categoriasComFlag = data.map(c => ({
-          ...c,
-          isPadrao: c.padrao
-        }));
+      setCategorias(categoriasComFlag);
 
-        setCategorias(categoriasComFlag);
+      const favoritosSalvos =
+        JSON.parse(localStorage.getItem("favoritos")) || [];
 
-        const favoritosSalvos =
-          JSON.parse(localStorage.getItem("favoritos")) || [];
-
-        setFavoritos(favoritosSalvos);
-
-      } else {
-        setCategorias([]);
-      }
+      setFavoritos(favoritosSalvos);
 
     } catch (error) {
       console.error("Erro ao carregar categorias:", error);
@@ -68,6 +56,29 @@ export default function CategoriasPage() {
   useEffect(() => {
     carregarCategorias();
   }, [carregarCategorias]);
+
+  useEffect(() => {
+    const termo = busca.trim();
+    if (!termo) return;
+
+    const timer = setTimeout(async () => {
+      try {
+        const { data } = await api.get(
+          `/categorias/perfil/${perfilId}/buscar`,
+          { params: { nome: termo } }
+        );
+        setResultadoBusca(data);
+      } catch (error) {
+        console.error("Erro ao buscar categorias:", error);
+        setResultadoBusca([]);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [busca, perfilId]);
+
+  const categoriasExibidas =
+    busca.trim() && resultadoBusca ? resultadoBusca : categorias;
 
   const handleMenuClick = (acao) => {
     setAcaoSelecionada(acao);
@@ -101,6 +112,10 @@ export default function CategoriasPage() {
 
   const handleCategoriaClick = (categoria) => {
     navigate(`/perfil/${perfilId}/categoria/${categoria.id}`);
+  };
+
+  const handleEditarCategoria = (categoria) => {
+    navigate(`/editar-categoria/${perfilId}/${categoria.id}`);
   };
 
   if (loading) {
@@ -144,13 +159,22 @@ export default function CategoriasPage() {
           Categorias
         </h2>
 
-        {categorias.length > 0 ? (
+        <input
+          type="text"
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#004687] bg-white mb-6"
+          placeholder="Buscar categoria pelo nome"
+        />
+
+        {categoriasExibidas.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
-            {categorias.map(categoria => (
+            {categoriasExibidas.map(categoria => (
               <CategoriaCard
                 key={categoria.id}
                 categoria={categoria}
                 onClick={handleCategoriaClick}
+                onEditar={handleEditarCategoria}
               />
             ))}
           </div>
@@ -172,7 +196,7 @@ export default function CategoriasPage() {
   );
 }
 
-function CategoriaCard({ categoria, onClick }) {
+function CategoriaCard({ categoria, onClick, onEditar }) {
   return (
     <div
       onClick={() => onClick(categoria)}
@@ -190,10 +214,20 @@ function CategoriaCard({ categoria, onClick }) {
         />
       </div>
 
-      <div className="p-2 sm:p-3 text-center">
-        <h3 className="font-bold text-xs sm:text-sm text-blue-900 truncate">
+      <div className="p-2 sm:p-3 text-center flex items-center">
+        <h3 className="flex-1 font-bold text-xs sm:text-sm text-blue-900 truncate">
           {categoria.nome}
         </h3>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onEditar(categoria);
+          }}
+          className="ml-2 text-blue-900 text-sm transition-transform hover:scale-110"
+        >
+          <FaPen />
+        </button>
       </div>
     </div>
   );

@@ -16,6 +16,8 @@ export default function HeaderPerfil({ perfil, onMenuClick }) {
       navigate(`/criar-botao/${perfilId}`);
     } else if (acao === 'editar-perfil') {
       navigate(`/editar-perfil/${perfilId}`);
+    } else if (acao === 'minha-conta') {
+      navigate('/minha-conta');
     } else if (acao === 'sair') {
       navigate(`/meus-perfis`);
     } else if (acao === 'sair-conta') {
@@ -80,6 +82,12 @@ export default function HeaderPerfil({ perfil, onMenuClick }) {
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                 >
                   Sair do Perfil
+                </button>
+                <button
+                  onClick={() => handleMenuClick('minha-conta')}
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                >
+                  Minha Conta
                 </button>
                 <hr className="my-1" />
                 <button 

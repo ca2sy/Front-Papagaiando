@@ -12,6 +12,11 @@ import BotoesPage from "./pages/Botoes/Botoes";
 import EditarPerfil from "./pages/Perfil/EditarPerfil";  
 import CriarCategoria from "./pages/Categorias/CriarCategoria";
 import CriarBotao from "./pages/Botoes/CriarBotao";
+import EditarCategoria from "./pages/Categorias/EditarCategoria";
+import EditarBotao from "./pages/Botoes/EditarBotao";
+import MinhaConta from "./pages/Conta/MinhaConta";
+import EsqueciSenha from "./pages/Login/EsqueciSenha";
+import RedefinirSenha from "./pages/Login/RedefinirSenha";
 
 createRoot(document.getElementById("root")).render(
 
@@ -26,6 +31,11 @@ createRoot(document.getElementById("root")).render(
         <Route path="/editar-perfil/:perfilId" element={<EditarPerfil />} />
         <Route path="/criar-categoria/:perfilId" element={<CriarCategoria />} />
         <Route path="/criar-botao/:perfilId" element={<CriarBotao />} />
+        <Route path="/editar-categoria/:perfilId/:categoriaId" element={<EditarCategoria />} />
+        <Route path="/editar-botao/:perfilId/:botaoId" element={<EditarBotao />} />
+        <Route path="/minha-conta" element={<MinhaConta />} />
+        <Route path="/esqueci-senha" element={<EsqueciSenha />} />
+        <Route path="/redefinir-senha" element={<RedefinirSenha />} />
       </Routes>
     </BrowserRouter>
 

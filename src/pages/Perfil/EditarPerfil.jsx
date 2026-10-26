@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import api, { mensagemDeErro } from "../../services/api";
+import SenhaModal from "../../components/SenhaModal.jsx";
 
 export default function EditarPerfil() {
   const [nome, setNome] = useState("");
   const [fotoSelecionada, setFotoSelecionada] = useState(null);
   const [loading, setLoading] = useState(false);
   const [carregando, setCarregando] = useState(true);
+  const [showSenhaModal, setShowSenhaModal] = useState(false);
   const navigate = useNavigate();
   const { perfilId } = useParams();
 
@@ -25,21 +28,16 @@ export default function EditarPerfil() {
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/perfis/${perfilId}`, {
-          headers: { Authorization: "Bearer " + token }
-        });
-
-        if (response.ok) {
-          const perfil = await response.json();
-          setNome(perfil.nome);
-          setFotoSelecionada(perfil.urlFoto);
-        } else {
-          alert("Erro ao carregar perfil");
-          navigate("/meus-perfis");
-        }
+        const { data: perfil } = await api.get(`/perfis/${perfilId}`);
+        setNome(perfil.nome);
+        setFotoSelecionada(perfil.urlFoto);
       } catch (error) {
         console.error("Erro ao carregar perfil:", error);
         alert("Erro ao carregar perfil");
+
+        if (error.response) {
+          navigate("/meus-perfis");
+        }
       } finally {
         setCarregando(false);
       }
@@ -67,34 +65,41 @@ export default function EditarPerfil() {
 
     try {
       const payload = { nome, urlFoto: fotoSelecionada };
-      const response = await fetch(`http://localhost:8080/perfis/${perfilId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify(payload)
-      });
+      await api.put(`/perfis/${perfilId}`, payload);
 
-      if (response.ok) {
-        alert("Perfil atualizado com sucesso!");
-        navigate(`/perfil/${perfilId}/categorias`);
-      } else if (response.status === 401) {
-        alert("Usuário não autenticado. Faça login novamente.");
-        navigate("/");
-      } else {
-        const errorData = await response.json();
-        alert("Erro ao atualizar perfil: " + (errorData.message || "Tente novamente"));
-      }
+      alert("Perfil atualizado com sucesso!");
+      navigate(`/perfil/${perfilId}/categorias`);
     } catch (error) {
       console.error("Erro ao atualizar perfil:", error);
-      alert("Erro ao atualizar perfil. Tente novamente.");
+
+      if (error.response?.status === 401) {
+        alert("Usuário não autenticado. Faça login novamente.");
+      } else if (error.response) {
+        alert("Erro ao atualizar perfil: " + (error.response.data?.message || "Tente novamente"));
+      } else {
+        alert("Erro ao atualizar perfil. Tente novamente.");
+      }
     }
     setLoading(false);
   };
 
   const handleVoltar = () => {
     navigate(`/perfil/${perfilId}/categorias`);
+  };
+
+  const excluirPerfil = async () => {
+    setShowSenhaModal(false);
+    setLoading(true);
+
+    try {
+      await api.delete(`/perfis/${perfilId}`);
+      alert("Perfil excluído com sucesso!");
+      navigate("/meus-perfis");
+    } catch (error) {
+      console.error("Erro ao excluir perfil:", error);
+      alert("Erro ao excluir perfil: " + mensagemDeErro(error, "Tente novamente"));
+      setLoading(false);
+    }
   };
 
   if (carregando) {
@@ -153,7 +158,23 @@ export default function EditarPerfil() {
             {loading ? "Salvando..." : "Salvar Alterações"}
           </button>
         </form>
+
+        <button
+          onClick={() => setShowSenhaModal(true)}
+          disabled={loading}
+          className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-center font-medium mt-4 rounded-lg"
+        >
+          Excluir Perfil
+        </button>
       </div>
+
+      <SenhaModal
+        isOpen={showSenhaModal}
+        onClose={() => setShowSenhaModal(false)}
+        onConfirm={excluirPerfil}
+        titulo="Excluir perfil"
+        mensagem="Essa ação não pode ser desfeita. Digite sua senha para excluir o perfil:"
+      />
     </div>
   );
 }

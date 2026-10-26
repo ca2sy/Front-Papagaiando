@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import api from "../../services/api";
 
 export default function Cadastro() {
   const [form, setForm] = useState({
@@ -30,22 +31,19 @@ export default function Cadastro() {
     };
 
     try {
-      const response = await fetch("http://localhost:8080/usuarios", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        alert("Cadastro realizado com sucesso!");
-        navigate("/");
-      } else {
-        const errorData = await response.json();
-        alert("Erro ao cadastrar: " + (errorData.message || "Tente novamente."));
-      }
+      const { data } = await api.post("/usuarios", payload);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.usuario.id);
+      alert("Cadastro realizado com sucesso!");
+      navigate("/meus-perfis");
     } catch (error) {
       console.error("Erro ao cadastrar:", error);
-      alert("Não foi possível realizar o cadastro. Tente novamente.");
+
+      if (error.response) {
+        alert("Erro ao cadastrar: " + (error.response.data?.message || "Tente novamente."));
+      } else {
+        alert("Não foi possível realizar o cadastro. Tente novamente.");
+      }
     }
   };
 
