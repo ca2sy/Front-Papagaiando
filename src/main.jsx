@@ -12,6 +12,10 @@ import BotoesPage from "./pages/Botoes/Botoes";
 import EditarPerfil from "./pages/Perfil/EditarPerfil";  
 import CriarCategoria from "./pages/Categorias/CriarCategoria";
 import CriarBotao from "./pages/Botoes/CriarBotao";
+import EditarCategoria from "./pages/Categorias/EditarCategoria";
+import EditarBotao from "./pages/Botoes/EditarBotao";
+import MinhaConta from "./pages/Perfil/MinhaConta";
+import RotaProtegida from "./components/RotaProtegida";
 
 createRoot(document.getElementById("root")).render(
 
@@ -19,6 +23,8 @@ createRoot(document.getElementById("root")).render(
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />
+
+        <Route element={<RotaProtegida />}>
         <Route path="/meus-perfis" element={<MeusPerfis />} />
         <Route path="/criar-perfil" element={<CriarPerfil />} />
         <Route path="/perfil/:perfilId/categorias" element={<CategoriasPage />} />
@@ -26,6 +32,10 @@ createRoot(document.getElementById("root")).render(
         <Route path="/editar-perfil/:perfilId" element={<EditarPerfil />} />
         <Route path="/criar-categoria/:perfilId" element={<CriarCategoria />} />
         <Route path="/criar-botao/:perfilId" element={<CriarBotao />} />
+        <Route path="/perfil/:perfilId/categoria/:categoriaId/editar" element={<EditarCategoria />}/>
+        <Route path="/perfil/:perfilId/categoria/:categoriaId/botao/:botaoId/editar" element={<EditarBotao />}/>
+        <Route path="/minha-conta" element={<MinhaConta />} />
+        </Route>
       </Routes>
     </BrowserRouter>
 

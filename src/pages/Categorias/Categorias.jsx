@@ -12,6 +12,9 @@ export default function CategoriasPage() {
   const [perfil, setPerfil] = useState(null);
   const [showSenhaModal, setShowSenhaModal] = useState(false);
   const [acaoSelecionada, setAcaoSelecionada] = useState(null);
+  const [categoriaParaExcluir, setCategoriaParaExcluir] = useState(null);
+  const [excluindo, setExcluindo] = useState(false);
+  const [erroExclusao, setErroExclusao] = useState("");
 
   const navigate = useNavigate();
   const { perfilId } = useParams();
@@ -55,7 +58,7 @@ export default function CategoriasPage() {
         setCategorias(categoriasComFlag);
 
         const favoritosSalvos =
-          JSON.parse(localStorage.getItem("favoritos")) || [];
+          JSON.parse(localStorage.getItem(`favoritos:${perfilId}`)) || [];
 
         setFavoritos(favoritosSalvos);
 
@@ -87,6 +90,31 @@ export default function CategoriasPage() {
     carregarCategorias();
   }, [carregarCategorias]);
 
+  useEffect(() => {
+    const atualizarFavoritos = () => {
+      try {
+        const salvos = JSON.parse(
+          localStorage.getItem(`favoritos:${perfilId}`) || "[]"
+        );
+
+        setFavoritos(Array.isArray(salvos) ? salvos : []);
+      } catch {
+        setFavoritos([]);
+      }
+    };
+
+    atualizarFavoritos();
+
+    window.addEventListener("favoritosAtualizados", atualizarFavoritos);
+
+    return () => {
+      window.removeEventListener(
+        "favoritosAtualizados",
+        atualizarFavoritos
+      );
+    };
+  }, [perfilId]);
+
   const handleMenuClick = (acao) => {
     setAcaoSelecionada(acao);
     setShowSenhaModal(true);
@@ -117,8 +145,97 @@ export default function CategoriasPage() {
     }
   };
 
+  const restaurarCategoria = async (categoria) => {
+    if (!window.confirm(`Restaurar "${categoria.nome}" para o padrão?`)) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/");
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/categorias/${categoria.id}/restaurar?perfilId=${encodeURIComponent(perfilId)}`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(await getApiError(response));
+      }
+
+      const restaurada = await response.json();
+
+      setCategorias((anteriores) =>
+        anteriores.map((item) =>
+          item.id === categoria.id ? restaurada : item
+        )
+      );
+    } catch (error) {
+      alert(error.message || "Erro ao restaurar categoria.");
+    }
+  };
+
+  
+  const reproduzirFavorito = (botao) => {
+    if (!botao.urlAudio) return;
+
+    const audio = new Audio(botao.urlAudio);
+
+    audio.play().catch(() => {
+      alert("Não foi possível reproduzir o áudio.");
+    });
+  };
+
   const handleCategoriaClick = (categoria) => {
     navigate(`/perfil/${perfilId}/categoria/${categoria.id}`);
+  };
+
+  const excluirCategoria = async () => {
+    if (!categoriaParaExcluir || excluindo) return;
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/");
+      return;
+    }
+
+    setExcluindo(true);
+    setErroExclusao("");
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/categorias/${categoriaParaExcluir.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const mensagem = await getApiError(
+          response,
+          "Não foi possível excluir a categoria."
+        );
+
+        throw new Error(mensagem);
+      }
+
+      setCategorias((anteriores) =>
+        anteriores.filter(
+          (categoria) => categoria.id !== categoriaParaExcluir.id
+        )
+      );
+
+      setCategoriaParaExcluir(null);
+    } catch (error) {
+      setErroExclusao(error.message);
+    } finally {
+      setExcluindo(false);
+    }
   };
 
   if (loading) {
@@ -151,7 +268,8 @@ export default function CategoriasPage() {
                 <BotaoFala
                   key={botao.id}
                   botao={botao}
-                  onClick={() => {}}
+                  perfilId={perfilId}
+                  onClick={reproduzirFavorito}
                 />
               ))}
             </div>
@@ -165,11 +283,51 @@ export default function CategoriasPage() {
         {categorias.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
             {categorias.map(categoria => (
-              <CategoriaCard
-                key={categoria.id}
-                categoria={categoria}
-                onClick={handleCategoriaClick}
-              />
+              <div key={categoria.id} className="relative">
+                <CategoriaCard
+                  categoria={categoria}
+                  onClick={handleCategoriaClick}
+                />
+
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigate(
+                        `/perfil/${perfilId}/categoria/${categoria.id}/editar`
+                      )
+                    }
+                    className="bg-white text-[#004687] rounded-lg px-3 py-2 shadow-md text-sm font-semibold"
+                    aria-label={`Editar categoria ${categoria.nome}`}
+                  >
+                    Editar
+                  </button>
+
+                  {categoria.padrao && categoria.personalizado && (
+                    <button
+                      type="button"
+                      onClick={() => restaurarCategoria(categoria)}
+                      className="rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#004687]"
+                    >
+                      Restaurar
+                    </button>
+                  )}
+
+                  {!categoria.padrao && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setErroExclusao("");
+                        setCategoriaParaExcluir(categoria);
+                      }}
+                      className="bg-white text-red-600 rounded-lg px-3 py-2 shadow-md text-sm font-semibold"
+                      aria-label={`Excluir categoria ${categoria.nome}`}
+                    >
+                      Excluir
+                    </button>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
         ) : (
@@ -186,6 +344,63 @@ export default function CategoriasPage() {
         titulo="Confirmar ação"
         mensagem="Por favor, digite sua senha para continuar:"
       />
+
+      {categoriaParaExcluir && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="titulo-exclusao"
+            aria-describedby="descricao-exclusao"
+            className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl"
+          >
+            <h2
+              id="titulo-exclusao"
+              className="text-xl font-bold text-[#004687] mb-3"
+            >
+              Excluir categoria?
+            </h2>
+
+            <p
+              id="descricao-exclusao"
+              className="text-gray-700 mb-4"
+            >
+              Deseja realmente excluir a categoria{" "}
+              <strong>{categoriaParaExcluir.nome}</strong>?
+              Esta ação não poderá ser desfeita.
+            </p>
+
+            {erroExclusao && (
+              <p role="alert" className="text-red-600 text-sm mb-4">
+                {erroExclusao}
+              </p>
+            )}
+
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                disabled={excluindo}
+                onClick={() => {
+                  setCategoriaParaExcluir(null);
+                  setErroExclusao("");
+                }}
+                className="px-4 py-2 rounded-lg border border-[#004687] text-[#004687]"
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                disabled={excluindo}
+                onClick={excluirCategoria}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white disabled:opacity-50"
+              >
+                {excluindo ? "Excluindo..." : "Excluir"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

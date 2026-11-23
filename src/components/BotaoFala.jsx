@@ -1,25 +1,26 @@
 import { useEffect, useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 
-export default function BotaoFala({ botao, onClick }) {
+export default function BotaoFala({ botao, onClick, perfilId }) {
   const [favoritado, setFavoritado] = useState(false);
+  const chaveFavoritos = `favoritos:${perfilId}`;
 
   useEffect(() => {
     const favoritosSalvos =
-      JSON.parse(localStorage.getItem("favoritos")) || [];
+      JSON.parse(localStorage.getItem(chaveFavoritos)) || [];
 
     const jaFavoritado = favoritosSalvos.some(
       (favorito) => favorito.id === botao.id
     );
 
     setFavoritado(jaFavoritado);
-  }, [botao.id]);
+  }, [botao.id, chaveFavoritos]);
 
   const toggleFavorito = (e) => {
     e.stopPropagation();
 
     const favoritosSalvos =
-      JSON.parse(localStorage.getItem("favoritos")) || [];
+      JSON.parse(localStorage.getItem(chaveFavoritos)) || [];
 
     let novosFavoritos;
 
@@ -40,9 +41,11 @@ export default function BotaoFala({ botao, onClick }) {
     }
 
     localStorage.setItem(
-      "favoritos",
+      chaveFavoritos,
       JSON.stringify(novosFavoritos)
     );
+
+    window.dispatchEvent(new Event("favoritosAtualizados"));
   };
 
   return (
