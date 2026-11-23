@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { API_BASE_URL, getApiError } from "../services/api";
+
 
 export default function SenhaModal({ isOpen, onClose, onConfirm, titulo, mensagem }) {
   const [senha, setSenha] = useState("");
@@ -6,8 +8,15 @@ export default function SenhaModal({ isOpen, onClose, onConfirm, titulo, mensage
   const [erro, setErro] = useState("");
 
   const handleConfirmar = async () => {
-    if (!senha) {
-      setErro("Por favor, digite sua senha");
+    if (!senha.trim()) {
+      setErro("Por favor, digite sua senha.");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setErro("Sessão expirada. Faça login novamente.");
       return;
     }
 
@@ -15,42 +24,45 @@ export default function SenhaModal({ isOpen, onClose, onConfirm, titulo, mensage
     setErro("");
 
     try {
-      const userId = localStorage.getItem("userId");
-      const token = localStorage.getItem("token");
-      
-      if (!userId || !token) {
-        setErro("Sessão expirada. Faça login novamente.");
-        setLoading(false);
-        return;
-      }
-
-      // Verificar a senha no backend
-      const response = await fetch("http://localhost:8080/auth/verificar-senha", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({ userId, senha }),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/auth/verificar-senha`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ senha }),
+        }
+      );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        setErro(errorData.error || "Senha incorreta");
-        setLoading(false);
+        const mensagem = await getApiError(
+          response,
+          "Não foi possível verificar a senha."
+        );
+
+        setErro(mensagem);
         return;
       }
 
-      // Senha correta
-      onConfirm();
+      const data = await response.json();
+
+      if (data.valido !== true) {
+        setErro("Senha incorreta.");
+        return;
+      }
+
       setSenha("");
       setErro("");
+      onConfirm();
+
     } catch (error) {
       console.error("Erro ao verificar senha:", error);
-      setErro("Erro de conexão com o servidor");
+      setErro("Erro de conexão com o servidor.");
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   const handleClose = () => {

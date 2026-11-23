@@ -1,30 +1,29 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import papagaiandoImg from "../assets/papagaiando.jpg";
 
 export default function HeaderPerfil({ perfil, onMenuClick }) {
   const [menuAberto, setMenuAberto] = useState(false);
   const navigate = useNavigate();
-  const { perfilId } = useParams();
 
   const handleMenuClick = (acao) => {
     setMenuAberto(false);
-    
-    if (acao === 'criar-categoria') {
-      navigate(`/criar-categoria/${perfilId}`);
-    } else if (acao === 'criar-botao') {
-      navigate(`/criar-botao/${perfilId}`);
-    } else if (acao === 'editar-perfil') {
-      navigate(`/editar-perfil/${perfilId}`);
-    } else if (acao === 'sair') {
-      navigate(`/meus-perfis`);
-    } else if (acao === 'sair-conta') {
-      // Limpa dados de autenticação
-      localStorage.clear();
+
+    if (acao === "sair-conta") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userId");
       sessionStorage.clear();
-      // Redireciona para o login
-      navigate('/');
-    } else {
+
+      navigate("/");
+      return;
+    }
+
+    if (acao === "sair") {
+      navigate("/meus-perfis");
+      return;
+    }
+
+    if (onMenuClick) {
       onMenuClick(acao);
     }
   };

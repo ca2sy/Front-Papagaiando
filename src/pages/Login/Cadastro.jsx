@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { API_BASE_URL, getApiError } from "../../services/api";
 
 export default function Cadastro() {
   const [form, setForm] = useState({
@@ -30,7 +31,7 @@ export default function Cadastro() {
     };
 
     try {
-      const response = await fetch("http://localhost:8080/usuarios", {
+      const response = await fetch(`${API_BASE_URL}/usuarios`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -40,8 +41,11 @@ export default function Cadastro() {
         alert("Cadastro realizado com sucesso!");
         navigate("/");
       } else {
-        const errorData = await response.json();
-        alert("Erro ao cadastrar: " + (errorData.message || "Tente novamente."));
+        const mensagem = await getApiError(
+          response,
+          "Não foi possível realizar o cadastro."
+        );
+        alert("Erro ao cadastrar: " + mensagem);
       }
     } catch (error) {
       console.error("Erro ao cadastrar:", error);

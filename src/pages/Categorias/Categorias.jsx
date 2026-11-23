@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import HeaderPerfil from "../../components/HeaderPerfil.jsx";
 import SenhaModal from "../../components/SenhaModal.jsx";
 import BotaoFala from "../../components/BotaoFala.jsx";
+import { API_BASE_URL, getApiError } from "../../services/api";
 
 export default function CategoriasPage() {
   const [categorias, setCategorias] = useState([]);
@@ -17,11 +18,16 @@ export default function CategoriasPage() {
 
   const carregarCategorias = useCallback(async () => {
     const token = localStorage.getItem("token");
-    if (!token || !perfilId) return;
+
+      if (!token || !perfilId) {
+        setLoading(false);
+        navigate(!token ? "/" : "/meus-perfis");
+      return;
+    }
 
     try {
       // Buscar perfil
-      const perfilResponse = await fetch(`http://localhost:8080/perfis/${perfilId}`, {
+      const perfilResponse = await fetch(`${API_BASE_URL}/perfis/${perfilId}`, {
         headers: { Authorization: "Bearer " + token }
       });
 
@@ -32,7 +38,7 @@ export default function CategoriasPage() {
 
       // Buscar categorias do perfil
       const categoriasResponse = await fetch(
-        `http://localhost:8080/categorias/perfil/${perfilId}`,
+        `${API_BASE_URL}/categorias/perfil/${perfilId}`,
         {
           headers: { Authorization: "Bearer " + token }
         }
@@ -54,7 +60,19 @@ export default function CategoriasPage() {
         setFavoritos(favoritosSalvos);
 
       } else {
+         const mensagem = await getApiError(
+          categoriasResponse,
+          "Não foi possível carregar as categorias."
+        );
+
+        console.error("Erro ao buscar categorias:", mensagem);
         setCategorias([]);
+
+        if (categoriasResponse.status === 401) {
+          navigate("/");
+        } else {
+          alert(mensagem);
+        }
       }
 
     } catch (error) {
@@ -63,7 +81,7 @@ export default function CategoriasPage() {
     } finally {
       setLoading(false);
     }
-  }, [perfilId]);
+  }, [perfilId, navigate]);
 
   useEffect(() => {
     carregarCategorias();

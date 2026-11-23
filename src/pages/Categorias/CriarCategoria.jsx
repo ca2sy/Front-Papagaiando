@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createClient } from "@supabase/supabase-js";
+import { API_BASE_URL, getApiError } from "../../services/api";
+
 
 const SUPABASE_URL = "https://bkueynyjbvxuavboqnja.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdWV5bnlqYnZ4dWF2Ym9xbmphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwMzgwNzEsImV4cCI6MjA3MDYxNDA3MX0.c_9cK5NIgi9e-Tf-xRw3gDi2SJbyxPPb8lBj9Usvck0";
@@ -67,7 +69,7 @@ export default function CriarCategoria() {
       perfilId: perfilId,
     };
 
-    const response = await fetch("http://localhost:8080/categorias", {
+    const response = await fetch(`${API_BASE_URL}/categorias`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -77,10 +79,12 @@ export default function CriarCategoria() {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        `Erro ao salvar categoria: ${errorData.message || "Tente novamente"}`
+      const mensagem = await getApiError(
+        response,
+        "Não foi possível criar a categoria."
       );
+
+      throw new Error(mensagem);
     }
 
     return await response.json();

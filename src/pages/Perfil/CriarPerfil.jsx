@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL, getApiError } from "../../services/api";
 
 export default function CriarPerfil() {
   const [nome, setNome] = useState("");
@@ -23,9 +24,8 @@ export default function CriarPerfil() {
 
     setLoading(true);
     const token = localStorage.getItem("token");
-    const usuarioId = localStorage.getItem("userId");
 
-    if (!token || !usuarioId) {
+    if (!token) {
       alert("Usuário não autenticado. Faça login novamente.");
       setLoading(false);
       navigate("/"); // volta pro login
@@ -33,8 +33,9 @@ export default function CriarPerfil() {
     }
 
     try {
-      const payload = { nome, urlFoto: fotoSelecionada, usuarioId };
-      const response = await fetch("http://localhost:8080/perfis", {
+      const payload = { nome, urlFoto: fotoSelecionada };
+
+      const response = await fetch(`${API_BASE_URL}/perfis`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,8 +53,11 @@ export default function CriarPerfil() {
         alert("Usuário não autenticado. Faça login novamente.");
         navigate("/"); // volta pro login
       } else {
-        const errorData = await response.json();
-        alert("Erro ao criar perfil: " + (errorData.message || "Tente novamente"));
+        const mensagem = await getApiError(
+          response,
+          "Não foi possível criar o perfil."
+        );
+        alert("Erro ao criar perfil: " + mensagem);
       }
     } catch (error) {
       console.error("Erro ao criar perfil:", error);

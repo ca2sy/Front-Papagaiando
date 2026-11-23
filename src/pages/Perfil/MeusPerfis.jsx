@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import papagaiandoImg from "../../assets/papagaiando.jpg"
+import { API_BASE_URL, getApiError } from "../../services/api";
 export default function MeusPerfis() {
   const [perfis, setPerfis] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,10 +10,15 @@ export default function MeusPerfis() {
   useEffect(() => {
     const fetchPerfis = async () => {
       const token = localStorage.getItem("token");
-      if (!token) return;
+
+      if (!token) {
+        setLoading(false);
+        navigate("/");
+        return;
+      }
 
       try {
-        const response = await fetch("http://localhost:8080/perfis/me", {
+        const response = await fetch(`${API_BASE_URL}/perfis/me`, {
           headers: {
             Authorization: "Bearer " + token,
           },
@@ -22,8 +28,18 @@ export default function MeusPerfis() {
           const data = await response.json();
           setPerfis(data);
         } else {
-          console.error("Erro ao buscar perfis");
+        const mensagem = await getApiError(
+          response,
+          "Não foi possível carregar os perfis."
+        );
+
+        console.error("Erro ao buscar perfis:", mensagem);
+        alert(mensagem);
+
+        if (response.status === 401) {
+          navigate("/");
         }
+      }
       } catch (error) {
         console.error("Erro de conexão:", error);
       } finally {

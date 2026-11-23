@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import HeaderPerfil from "../../components/HeaderPerfil.jsx";
 import SenhaModal from "../../components/SenhaModal.jsx";
 import BotaoFala from "../../components/BotaoFala.jsx";
+import { API_BASE_URL, getApiError } from "../../services/api";
 
 export default function BotoesPage() {
   const [botoes, setBotoes] = useState([]);
@@ -26,7 +27,7 @@ export default function BotoesPage() {
     try {
       // Buscar perfil
       const perfilResponse = await fetch(
-        `http://localhost:8080/perfis/${perfilId}`,
+        `${API_BASE_URL}/perfis/${perfilId}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -39,7 +40,7 @@ export default function BotoesPage() {
 
       // Buscar botões
       const botoesResponse = await fetch(
-        `http://localhost:8080/botoes/categoria/${categoriaId}`,
+        `${API_BASE_URL}/botoes/categoria/${categoriaId}?perfilId=${encodeURIComponent(perfilId)}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -49,17 +50,24 @@ export default function BotoesPage() {
         const todosBotoes = await botoesResponse.json();
         setBotoes(todosBotoes);
       } else {
-        console.error(
-          "Erro ao buscar botões:",
-          botoesResponse.status
+        const mensagem = await getApiError(
+          botoesResponse,
+          "Não foi possível carregar os botões."
         );
 
+        console.error("Erro ao buscar botões:", mensagem);
         setBotoes([]);
+
+        if (botoesResponse.status === 401) {
+          navigate("/");
+        } else {
+         alert(mensagem);
+        }
       }
 
       // Buscar categoria
       const categoriasResponse = await fetch(
-        `http://localhost:8080/categorias/perfil/${perfilId}`,
+        `${API_BASE_URL}/perfis/${perfilId}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -94,7 +102,7 @@ export default function BotoesPage() {
     } finally {
       setLoading(false);
     }
-  }, [perfilId, categoriaId]);
+  }, [perfilId, categoriaId, navigate]);
 
   useEffect(() => {
     carregarDados();

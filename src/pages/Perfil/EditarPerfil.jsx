@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { API_BASE_URL, getApiError } from "../../services/api";
 
 export default function EditarPerfil() {
   const [nome, setNome] = useState("");
@@ -25,7 +26,7 @@ export default function EditarPerfil() {
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/perfis/${perfilId}`, {
+        const response = await fetch(`${API_BASE_URL}/perfis/${perfilId}`, {
           headers: { Authorization: "Bearer " + token }
         });
 
@@ -34,9 +35,14 @@ export default function EditarPerfil() {
           setNome(perfil.nome);
           setFotoSelecionada(perfil.urlFoto);
         } else {
-          alert("Erro ao carregar perfil");
-          navigate("/meus-perfis");
-        }
+        const mensagem = await getApiError(
+          response,
+          "Não foi possível carregar o perfil."
+        );
+
+        alert(mensagem);
+        navigate(response.status === 401 ? "/" : "/meus-perfis");
+      }
       } catch (error) {
         console.error("Erro ao carregar perfil:", error);
         alert("Erro ao carregar perfil");
@@ -67,7 +73,7 @@ export default function EditarPerfil() {
 
     try {
       const payload = { nome, urlFoto: fotoSelecionada };
-      const response = await fetch(`http://localhost:8080/perfis/${perfilId}`, {
+      const response = await fetch(`${API_BASE_URL}/perfis/${perfilId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -83,8 +89,12 @@ export default function EditarPerfil() {
         alert("Usuário não autenticado. Faça login novamente.");
         navigate("/");
       } else {
-        const errorData = await response.json();
-        alert("Erro ao atualizar perfil: " + (errorData.message || "Tente novamente"));
+        const mensagem = await getApiError(
+          response,
+          "Não foi possível atualizar o perfil."
+        );
+
+        alert("Erro ao atualizar perfil: " + mensagem);
       }
     } catch (error) {
       console.error("Erro ao atualizar perfil:", error);
