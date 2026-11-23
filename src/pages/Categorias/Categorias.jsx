@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import HeaderPerfil from "../../components/HeaderPerfil.jsx";
 import SenhaModal from "../../components/SenhaModal.jsx";
 import BotaoFala from "../../components/BotaoFala.jsx";
-import { API_BASE_URL, getApiError } from "../../services/api";
+import { API_BASE_URL, getApiError } from "../../services/api";
 import { aviso } from "../../components/Aviso";
 import TituloSecao from "../../components/TituloSecao";
 import { lerCache, salvarCache } from "../../services/cache";
@@ -142,6 +142,10 @@ export default function CategoriasPage() {
 
       case "sair":
         navigate("/meus-perfis");
+        break;
+
+      case "excluir-categoria":
+        excluirCategoria();
         break;
 
       default:
@@ -347,14 +351,6 @@ export default function CategoriasPage() {
         )}
       </div>
 
-      <SenhaModal
-        isOpen={showSenhaModal}
-        onClose={() => setShowSenhaModal(false)}
-        onConfirm={handleSenhaConfirmada}
-        titulo="Área do responsável"
-        mensagem="Para continuar, digite a senha da sua conta."
-      />
-
       <ConfirmModal
         aberto={!!categoriaParaExcluir}
         titulo="Excluir categoria?"
@@ -368,11 +364,23 @@ export default function CategoriasPage() {
         perigo
         carregando={excluindo}
         erro={erroExclusao}
-        onConfirmar={excluirCategoria}
+        onConfirmar={() => {
+          setAcaoSelecionada("excluir-categoria");
+          setShowSenhaModal(true);
+        }}
         onCancelar={() => {
           setCategoriaParaExcluir(null);
           setErroExclusao("");
         }}
+      />
+
+      {/* Depois do ConfirmModal para ficar por cima dele */}
+      <SenhaModal
+        isOpen={showSenhaModal}
+        onClose={() => setShowSenhaModal(false)}
+        onConfirm={handleSenhaConfirmada}
+        titulo="Área do responsável"
+        mensagem="Para continuar, digite a senha da sua conta."
       />
     </div>
   );
