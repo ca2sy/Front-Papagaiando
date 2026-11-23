@@ -3,13 +3,28 @@ import { useNavigate, useParams } from "react-router-dom";
 import HeaderPerfil from "../../components/HeaderPerfil.jsx";
 import SenhaModal from "../../components/SenhaModal.jsx";
 import BotaoFala from "../../components/BotaoFala.jsx";
-import { API_BASE_URL, getApiError } from "../../services/api";
+import { API_BASE_URL, getApiError } from "../../services/api";
+import { aviso } from "../../components/Aviso";
+import TituloSecao from "../../components/TituloSecao";
+import { FiPlus } from "react-icons/fi";
+import { lerCache, salvarCache } from "../../services/cache";
+import BotaoVoltar from "../../components/BotaoVoltar";
+import TelaCarregando from "../../components/Carregando";
+import ConfirmModal from "../../components/ConfirmModal";
+import { confirmar } from "../../components/confirmar";
 
 export default function BotoesPage() {
-  const [botoes, setBotoes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [perfil, setPerfil] = useState(null);
-  const [categoria, setCategoria] = useState(null);
+  const { perfilId, categoriaId } = useParams();
+  const chaveBotoes = `botoes:${perfilId}:${categoriaId}`;
+  const chavePerfil = `perfil:${perfilId}`;
+
+  // Mostra na hora o que já estava salvo e atualiza em segundo plano
+  const [botoes, setBotoes] = useState(() => lerCache(chaveBotoes) || []);
+  const [loading, setLoading] = useState(() => !lerCache(chaveBotoes));
+  const [perfil, setPerfil] = useState(() => lerCache(chavePerfil));
+  const [categoria, setCategoria] = useState(() =>
+    (lerCache(`categorias:${perfilId}`) || []).find((c) => c.id === categoriaId) || null
+  );
   const [showSenhaModal, setShowSenhaModal] = useState(false);
   const [acaoSelecionada, setAcaoSelecionada] = useState(null);
   const [botaoParaEditar, setBotaoParaEditar] = useState(null);
@@ -18,7 +33,6 @@ export default function BotoesPage() {
   const [erroExclusao, setErroExclusao] = useState("");
 
   const navigate = useNavigate();
-  const { perfilId, categoriaId } = useParams();
 
   const carregarDados = useCallback(async () => {
     const token = localStorage.getItem("token");
@@ -28,27 +42,24 @@ export default function BotoesPage() {
       return;
     }
 
+    const headers = { Authorization: `Bearer ${token}` };
+
     try {
-      // Buscar perfil
-      const perfilResponse = await fetch(
-        `${API_BASE_URL}/perfis/${perfilId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      // Perfil, botões e categorias são buscados ao mesmo tempo
+      const [perfilResponse, botoesResponse, categoriasResponse] = await Promise.all([
+        fetch(`${API_BASE_URL}/perfis/${perfilId}`, { headers }),
+        fetch(
+          `${API_BASE_URL}/botoes/categoria/${categoriaId}?perfilId=${encodeURIComponent(perfilId)}`,
+          { headers }
+        ),
+        fetch(`${API_BASE_URL}/categorias/perfil/${perfilId}`, { headers }),
+      ]);
 
       if (perfilResponse.ok) {
         const perfilData = await perfilResponse.json();
         setPerfil(perfilData);
+        salvarCache(chavePerfil, perfilData);
       }
-
-      // Buscar botões
-      const botoesResponse = await fetch(
-        `${API_BASE_URL}/botoes/categoria/${categoriaId}?perfilId=${encodeURIComponent(perfilId)}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
 
       if (botoesResponse.ok) {
         const todosBotoes = await botoesResponse.json();
@@ -60,60 +71,60 @@ export default function BotoesPage() {
         );
 
         console.error("Erro ao buscar botões:", mensagem);
-        setBotoes([]);
 
         if (botoesResponse.status === 401) {
           navigate("/");
         } else {
-         alert(mensagem);
+          aviso(mensagem, "erro");
         }
       }
 
-      // Buscar categoria
-      const categoriasResponse = await fetch(
-        `${API_BASE_URL}/categorias/perfil/${perfilId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-
       if (categoriasResponse.ok) {
-        const todasCategorias =
-          await categoriasResponse.json();
+        const todasCategorias = await categoriasResponse.json();
+        salvarCache(`categorias:${perfilId}`, todasCategorias);
 
-        const categoriaEncontrada =
-          todasCategorias.find(
-            c => c.id === categoriaId
-          );
+        const categoriaEncontrada = todasCategorias.find(
+          c => c.id === categoriaId
+        );
 
         if (categoriaEncontrada) {
           setCategoria(categoriaEncontrada);
         } else {
-          console.error(
-            "Categoria não encontrada na lista do perfil"
-          );
+          console.error("Categoria não encontrada na lista do perfil");
         }
       } else {
-        console.error(
-          "Erro ao buscar categorias:",
-          categoriasResponse.status
-        );
+        console.error("Erro ao buscar categorias:", categoriasResponse.status);
       }
 
     } catch (error) {
+      // Sem conexão: continua mostrando o que estava no cache
       console.error("Erro ao carregar dados:", error);
-      setBotoes([]);
     } finally {
       setLoading(false);
     }
-  }, [perfilId, categoriaId, navigate]);
+  }, [perfilId, categoriaId, navigate, chavePerfil]);
+
+  // Mantém o cache igual ao que está na tela (inclui excluir/restaurar)
+  useEffect(() => {
+    if (!loading) salvarCache(chaveBotoes, botoes);
+  }, [botoes, loading, chaveBotoes]);
 
   useEffect(() => {
     carregarDados();
   }, [carregarDados]);
 
   const restaurarBotao = async (botao) => {
-    if (!window.confirm(`Restaurar "${botao.nome}" para o padrão?`)) return;
+    const ok = await confirmar({
+      titulo: "Restaurar botão?",
+      mensagem: (
+        <>
+          O botão <strong>{botao.nome}</strong> vai voltar a ser como era
+          originalmente. As alterações feitas nele serão perdidas.
+        </>
+      ),
+      textoConfirmar: "Restaurar",
+    });
+    if (!ok) return;
 
     const token = localStorage.getItem("token");
     if (!token) return navigate("/");
@@ -139,7 +150,7 @@ export default function BotoesPage() {
         )
       );
     } catch (error) {
-      alert(error.message || "Erro ao restaurar botão.");
+      aviso(error.message || "Erro ao restaurar botão.", "erro");
     }
   };
 
@@ -252,9 +263,7 @@ export default function BotoesPage() {
           error
         );
 
-        alert(
-          "Não foi possível reproduzir o áudio"
-        );
+        aviso("Não foi possível reproduzir o áudio", "erro");
       });
     }
   };
@@ -264,13 +273,7 @@ export default function BotoesPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#b3daff] flex items-center justify-center">
-        <p className="text-xl text-blue-900">
-          Carregando botões...
-        </p>
-      </div>
-    );
+    return <TelaCarregando texto="Carregando botões..." />;
   }
 
   return (
@@ -283,46 +286,26 @@ export default function BotoesPage() {
       <div className="p-4 sm:p-6 max-w-7xl mx-auto">
 
         {/* Cabeçalho */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between gap-3 mb-6">
 
-          <button
-            onClick={handleVoltar}
-            className="flex items-center text-blue-900 hover:text-[#004687] font-medium"
-          >
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-
-            Voltar
-          </button>
-
-          {categoria && (
-            <div className="text-center flex-1">
-              <h1 className="text-2xl font-bold text-blue-900">
-                {categoria.nome}
-              </h1>
-            </div>
-          )}
+          <BotaoVoltar onClick={handleVoltar} texto="Categorias" />
 
           <button
             onClick={() =>
               handleMenuClick("criar-botao")
             }
-            className="bg-[#004687] hover:bg-[#003D99] text-white px-4 py-2 rounded-lg font-medium"
+            className="inline-flex items-center gap-2 rounded-full bg-[#004687] px-4 py-2 font-semibold text-white shadow-md hover:bg-[#003366] transition"
           >
-            + Botão
+            <FiPlus size={20} aria-hidden="true" />
+            Novo botão
           </button>
         </div>
+
+        <TituloSecao
+          como="h1"
+          titulo={categoria?.nome || "Botões"}
+          subtitulo="Toque em um botão para ouvir"
+        />
 
         {/* Grid de botões */}
         {botoes.length > 0 ? (
@@ -336,11 +319,11 @@ export default function BotoesPage() {
                   onClick={handleBotaoClick}
                 />
 
-                <div className="mt-2 flex gap-2">
+                <div className="mt-2 flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={() => handleEditarBotao(botao)}
-                    className="flex-1 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#004687] shadow-sm hover:bg-blue-50"
+                    className="flex-1 min-w-0 rounded-lg bg-white px-2 py-2 text-xs sm:text-sm font-semibold text-[#004687] shadow-sm hover:bg-blue-50"
                     aria-label={`Editar botão ${botao.nome}`}
                   >
                     Editar
@@ -353,7 +336,7 @@ export default function BotoesPage() {
                         setErroExclusao("");
                         setBotaoParaExcluir(botao);
                       }}
-                      className="flex-1 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-red-600 shadow-sm hover:bg-red-50"
+                      className="flex-1 min-w-0 rounded-lg bg-white px-2 py-2 text-xs sm:text-sm font-semibold text-red-600 shadow-sm hover:bg-red-50"
                       aria-label={`Excluir botão ${botao.nome}`}
                     >
                       Excluir
@@ -364,7 +347,7 @@ export default function BotoesPage() {
                     <button
                       type="button"
                       onClick={() => restaurarBotao(botao)}
-                      className="flex-1 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#004687]"
+                      className="flex-1 min-w-0 rounded-lg bg-white px-2 py-2 text-xs sm:text-sm font-semibold text-[#004687] shadow-sm hover:bg-blue-50"
                     >
                       Restaurar
                       </button>
@@ -394,65 +377,28 @@ export default function BotoesPage() {
         )}
       </div>
 
-        {botaoParaExcluir && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div
-              role="alertdialog"
-              aria-modal="true"
-              aria-labelledby="titulo-excluir-botao"
-              aria-describedby="descricao-excluir-botao"
-              className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
-            >
-              <h2
-                id="titulo-excluir-botao"
-                className="mb-3 text-xl font-bold text-[#004687]"
-              >
-                Excluir botão?
-              </h2>
-
-              <p
-                id="descricao-excluir-botao"
-                className="mb-4 text-gray-700"
-              >
-                Deseja realmente excluir o botão{" "}
-                <strong>{botaoParaExcluir.nome}</strong>?
-                Esta ação não poderá ser desfeita.
-              </p>
-
-              {erroExclusao && (
-                <p role="alert" className="mb-4 text-sm text-red-600">
-                  {erroExclusao}
-                </p>
-              )}
-
-              <div className="flex justify-end gap-3">
-                <button
-                  type="button"
-                  disabled={excluindo}
-                  onClick={() => {
-                    setBotaoParaExcluir(null);
-                    setErroExclusao("");
-                  }}
-                  className="rounded-lg border border-[#004687] px-4 py-2 text-[#004687]"
-                >
-                  Cancelar
-                </button>
-
-                <button
-                  type="button"
-                  disabled={excluindo}
-                  onClick={() => {
-                    setAcaoSelecionada("excluir-botao");
-                    setShowSenhaModal(true);
-                  }}
-                  className="rounded-lg bg-red-600 px-4 py-2 text-white disabled:opacity-50"
-                >
-                  {excluindo ? "Excluindo..." : "Excluir"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <ConfirmModal
+          aberto={!!botaoParaExcluir}
+          titulo="Excluir botão?"
+          mensagem={
+            <>
+              O botão <strong>{botaoParaExcluir?.nome}</strong> será apagado
+              para sempre. Essa ação não pode ser desfeita.
+            </>
+          }
+          textoConfirmar={excluindo ? "Excluindo..." : "Sim, excluir"}
+          perigo
+          carregando={excluindo}
+          erro={erroExclusao}
+          onConfirmar={() => {
+            setAcaoSelecionada("excluir-botao");
+            setShowSenhaModal(true);
+          }}
+          onCancelar={() => {
+            setBotaoParaExcluir(null);
+            setErroExclusao("");
+          }}
+        />
 
         {erroExclusao && !botaoParaExcluir && (
           <div role="alert" className="mx-auto max-w-xl p-4 text-red-700">
@@ -466,8 +412,8 @@ export default function BotoesPage() {
           setShowSenhaModal(false)
         }
         onConfirm={handleSenhaConfirmada}
-        titulo="Confirmar ação"
-        mensagem="Por favor, digite sua senha para continuar:"
+        titulo="Área do responsável"
+        mensagem="Para continuar, digite a senha da sua conta."
       />
     </div>
   );

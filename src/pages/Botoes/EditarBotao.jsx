@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_BASE_URL, getApiError } from "../../services/api";
+import TelaCarregando, { Spinner } from "../../components/Carregando";
+import BotaoVoltar from "../../components/BotaoVoltar";
+import CampoImagem from "../../components/CampoImagem";
+import { enviarImagem } from "../../services/supabase";
 
 export default function EditarBotao() {
   const { perfilId, categoriaId, botaoId } = useParams();
@@ -8,6 +12,7 @@ export default function EditarBotao() {
 
   const [nome, setNome] = useState("");
   const [urlImagem, setUrlImagem] = useState("");
+  const [arquivoImagem, setArquivoImagem] = useState(null);
   const [urlAudio, setUrlAudio] = useState("");
   const [loading, setLoading] = useState(true);
   const [salvando, setSalvando] = useState(false);
@@ -64,7 +69,7 @@ export default function EditarBotao() {
     e.preventDefault();
     setErro("");
 
-    if (!nome.trim() || !urlImagem.trim() || !urlAudio.trim()) {
+    if (!nome.trim() || (!urlImagem.trim() && !arquivoImagem) || !urlAudio.trim()) {
       setErro("Preencha todos os campos.");
       return;
     }
@@ -79,6 +84,10 @@ export default function EditarBotao() {
         return;
       }
 
+      const imagemFinal = arquivoImagem
+        ? await enviarImagem(`botoes/perfil-${perfilId}`, arquivoImagem)
+        : urlImagem.trim();
+
       const response = await fetch(
         `${API_BASE_URL}/botoes/${botaoId}?perfilId=${encodeURIComponent(perfilId)}`,
         {
@@ -89,7 +98,7 @@ export default function EditarBotao() {
           },
           body: JSON.stringify({
             nome: nome.trim(),
-            urlImagem: urlImagem.trim(),
+            urlImagem: imagemFinal,
             urlAudio: urlAudio.trim(),
           }),
         }
@@ -113,19 +122,16 @@ export default function EditarBotao() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#b3daff] flex items-center justify-center">
-        <p className="text-[#004687]">Carregando botão...</p>
-      </div>
-    );
+    return <TelaCarregando texto="Carregando botão..." />;
   }
 
   return (
     <div className="min-h-screen bg-[#b3daff] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-[#004687] mb-6 text-center">
-          Editar Botão
-        </h1>
+        <div className="mb-6">
+            <BotaoVoltar onClick={voltar} disabled={salvando} />
+            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">Editar Botão</h1>
+          </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -148,30 +154,15 @@ export default function EditarBotao() {
           </div>
 
           <div>
-            <label
-              htmlFor="urlImagem"
-              className="block text-[#004687] font-medium mb-2"
-            >
-              URL da imagem
-            </label>
-
-            <input
-              id="urlImagem"
-              type="url"
-              value={urlImagem}
-              onChange={(e) => setUrlImagem(e.target.value)}
+            <CampoImagem
+              rotulo="Imagem do botão"
+              url={urlImagem}
+              onUrlChange={setUrlImagem}
+              arquivo={arquivoImagem}
+              onArquivoChange={setArquivoImagem}
+              onErro={setErro}
               disabled={salvando}
-              required
-              className="w-full p-3 rounded-lg border-2 border-[#004687]"
             />
-
-            {urlImagem && (
-              <img
-                src={urlImagem}
-                alt="Prévia do botão"
-                className="w-32 h-32 object-contain rounded-lg mx-auto mt-4"
-              />
-            )}
           </div>
 
           <div>
@@ -212,7 +203,7 @@ export default function EditarBotao() {
               type="button"
               onClick={voltar}
               disabled={salvando}
-              className="flex-1 p-3 rounded-lg border-2 border-[#004687] text-[#004687]"
+              className="flex-1 p-3 rounded-lg border-2 border-[#004687] font-semibold text-[#004687] hover:bg-blue-50"
             >
               Cancelar
             </button>
@@ -220,8 +211,9 @@ export default function EditarBotao() {
             <button
               type="submit"
               disabled={salvando || loading}
-              className="flex-1 p-3 rounded-lg bg-[#004687] text-white disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 p-3 rounded-lg bg-[#004687] text-white disabled:opacity-70"
             >
+              {salvando && <Spinner tamanho={18} />}
               {salvando ? "Salvando..." : "Salvar"}
             </button>
           </div>

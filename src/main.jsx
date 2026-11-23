@@ -16,10 +16,14 @@ import EditarCategoria from "./pages/Categorias/EditarCategoria";
 import EditarBotao from "./pages/Botoes/EditarBotao";
 import MinhaConta from "./pages/Perfil/MinhaConta";
 import RotaProtegida from "./components/RotaProtegida";
+import AvisoContainer from "./components/AvisoContainer";
+import { ConfirmacaoContainer } from "./components/ConfirmModal";
 
 createRoot(document.getElementById("root")).render(
 
     <BrowserRouter>
+      <AvisoContainer />
+      <ConfirmacaoContainer />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />

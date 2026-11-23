@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { API_BASE_URL, getApiError } from "../../services/api";
+import { API_BASE_URL, getApiError } from "../../services/api";
+import { aviso } from "../../components/Aviso";
+import BotaoVoltar from "../../components/BotaoVoltar";
+import TelaCarregando, { Spinner } from "../../components/Carregando";
 
 export default function EditarPerfil() {
   const [nome, setNome] = useState("");
@@ -40,12 +43,12 @@ export default function EditarPerfil() {
           "Não foi possível carregar o perfil."
         );
 
-        alert(mensagem);
+        aviso(mensagem, "erro");
         navigate(response.status === 401 ? "/" : "/meus-perfis");
       }
       } catch (error) {
         console.error("Erro ao carregar perfil:", error);
-        alert("Erro ao carregar perfil");
+        aviso("Erro ao carregar perfil", "erro");
       } finally {
         setCarregando(false);
       }
@@ -57,7 +60,7 @@ export default function EditarPerfil() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!nome || !fotoSelecionada) {
-      alert("Preencha o nome e escolha uma imagem");
+      aviso("Preencha o nome e escolha uma imagem", "erro");
       return;
     }
 
@@ -65,7 +68,7 @@ export default function EditarPerfil() {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      alert("Usuário não autenticado. Faça login novamente.");
+      aviso("Usuário não autenticado. Faça login novamente.", "erro");
       setLoading(false);
       navigate("/");
       return;
@@ -83,10 +86,10 @@ export default function EditarPerfil() {
       });
 
       if (response.ok) {
-        alert("Perfil atualizado com sucesso!");
+        aviso("Perfil atualizado com sucesso!", "sucesso");
         navigate(`/perfil/${perfilId}/categorias`);
       } else if (response.status === 401) {
-        alert("Usuário não autenticado. Faça login novamente.");
+        aviso("Usuário não autenticado. Faça login novamente.", "erro");
         navigate("/");
       } else {
         const mensagem = await getApiError(
@@ -94,11 +97,11 @@ export default function EditarPerfil() {
           "Não foi possível atualizar o perfil."
         );
 
-        alert("Erro ao atualizar perfil: " + mensagem);
+        aviso("Erro ao atualizar perfil: " + mensagem, "erro");
       }
     } catch (error) {
       console.error("Erro ao atualizar perfil:", error);
-      alert("Erro ao atualizar perfil. Tente novamente.");
+      aviso("Erro ao atualizar perfil. Tente novamente.", "erro");
     }
     setLoading(false);
   };
@@ -108,27 +111,16 @@ export default function EditarPerfil() {
   };
 
   if (carregando) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-[#b3daff]">
-        <p className="text-xl text-[#004687]">Carregando...</p>
-      </div>
-    );
+    return <TelaCarregando texto="Carregando perfil..." />;
   }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#b3daff] p-4">
       <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-[#004687] border-2 border-[#004687]/30">
-        <div className="flex items-center mb-6">
-          <button
-            onClick={handleVoltar}
-            className="text-[#004687] hover:text-blue-100 mr-4"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="text-3xl font-extrabold">Editar Perfil</h1>
-        </div>
+        <div className="mb-6">
+            <BotaoVoltar onClick={handleVoltar} />
+            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">Editar Perfil</h1>
+          </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <input
@@ -158,8 +150,9 @@ export default function EditarPerfil() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg mt-4 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg mt-4 text-white disabled:opacity-70 disabled:cursor-not-allowed"
           >
+            {loading && <Spinner tamanho={18} />}
             {loading ? "Salvando..." : "Salvar Alterações"}
           </button>
         </form>

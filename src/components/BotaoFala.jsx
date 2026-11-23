@@ -57,7 +57,7 @@ export default function BotaoFala({ botao, onClick, perfilId }) {
         <img
           src={botao.urlImagem}
           alt={botao.nome}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain p-2"
           onError={(e) => {
             e.target.src =
               "https://via.placeholder.com/200?text=📻";

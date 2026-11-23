@@ -2,10 +2,16 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import papagaiandoImg from "../../assets/papagaiando.jpg";
 import { API_BASE_URL, getApiError } from "../../services/api";
+import { aviso } from "../../components/Aviso";
+import TelaCarregando from "../../components/Carregando";
+import ConfirmModal from "../../components/ConfirmModal";
+import { FiUser } from "react-icons/fi";
+import { lerCache, salvarCache } from "../../services/cache";
 
 export default function MeusPerfis() {
-  const [perfis, setPerfis] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Mostra na hora os perfis já salvos e atualiza em segundo plano
+  const [perfis, setPerfis] = useState(() => lerCache("perfis") || []);
+  const [loading, setLoading] = useState(() => !lerCache("perfis"));
   const [perfilParaExcluir, setPerfilParaExcluir] = useState(null);
   const [excluindo, setExcluindo] = useState(false);
   const [erroExclusao, setErroExclusao] = useState("");
@@ -39,7 +45,7 @@ export default function MeusPerfis() {
           );
 
           console.error("Erro ao buscar perfis:", mensagem);
-          alert(mensagem);
+          aviso(mensagem, "erro");
 
           if (response.status === 401) {
             navigate("/");
@@ -47,7 +53,7 @@ export default function MeusPerfis() {
         }
       } catch (error) {
         console.error("Erro de conexão:", error);
-        alert("Erro de conexão com o servidor.");
+        aviso("Erro de conexão com o servidor.", "erro");
       } finally {
         setLoading(false);
       }
@@ -55,6 +61,10 @@ export default function MeusPerfis() {
 
     fetchPerfis();
   }, [navigate]);
+
+  useEffect(() => {
+    if (!loading) salvarCache("perfis", perfis);
+  }, [perfis, loading]);
 
   const excluirPerfil = async () => {
     if (!perfilParaExcluir || excluindo) return;
@@ -106,42 +116,33 @@ export default function MeusPerfis() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#b3daff] flex items-center justify-center">
-        <p className="text-[#004687] text-xl">
-          Carregando perfis...
-        </p>
-      </div>
-    );
+    return <TelaCarregando texto="Carregando perfis..." />;
   }
 
   return (
     <div className="min-h-screen bg-[#b3daff]">
-      <header className="bg-[#004687] shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-3">
-            <div className="flex items-center">
-              <img
-                src={papagaiandoImg}
-                alt="Papagaiando"
-                className="h-8 w-auto"
-              />
-              <span className="ml-2 text-xl font-bold text-white">
-                Papagaiando
-              </span>
-            </div>
+      <header className="bg-[#004687] shadow-md">
+        <div className="flex justify-between items-center px-3 sm:px-5 py-3">
+          <div className="flex items-center">
+            <img
+              src={papagaiandoImg}
+              alt="Papagaiando"
+              className="h-10 w-10 rounded-full object-cover"
+            />
+            <span className="ml-2 text-xl sm:text-2xl font-bold text-white">
+              Papagaiando
+            </span>
           </div>
+
+          <button
+            onClick={() => navigate("/minha-conta")}
+            className="flex items-center gap-2 rounded-full bg-white px-4 py-2 font-semibold text-[#004687] shadow hover:bg-[#b3daff] transition"
+          >
+            <FiUser size={20} aria-hidden="true" />
+            Minha conta
+          </button>
         </div>
       </header>
-
-      <div className="flex justify-end px-6 pt-4">
-        <button
-          onClick={() => navigate("/minha-conta")}
-          className="rounded-lg bg-white px-4 py-2 text-[#004687]"
-        >
-          Minha Conta
-        </button>
-      </div>
 
       <div className="flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6">
         <div className="text-center mb-8 sm:mb-12">
@@ -213,62 +214,26 @@ export default function MeusPerfis() {
         </div>
       </div>
 
-      {perfilParaExcluir && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="titulo-exclusao-perfil"
-            aria-describedby="descricao-exclusao-perfil"
-            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
-          >
-            <h2
-              id="titulo-exclusao-perfil"
-              className="mb-3 text-xl font-bold text-[#004687]"
-            >
-              Excluir perfil?
-            </h2>
-
-            <p
-              id="descricao-exclusao-perfil"
-              className="mb-4 text-gray-700"
-            >
-              Deseja realmente excluir o perfil{" "}
-              <strong>{perfilParaExcluir.nome}</strong>?
-              Esta ação não poderá ser desfeita.
-            </p>
-
-            {erroExclusao && (
-              <p role="alert" className="mb-4 text-sm text-red-600">
-                {erroExclusao}
-              </p>
-            )}
-
-            <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                disabled={excluindo}
-                onClick={() => {
-                  setPerfilParaExcluir(null);
-                  setErroExclusao("");
-                }}
-                className="rounded-lg border border-[#004687] px-4 py-2 text-[#004687]"
-              >
-                Cancelar
-              </button>
-
-              <button
-                type="button"
-                disabled={excluindo}
-                onClick={excluirPerfil}
-                className="rounded-lg bg-red-600 px-4 py-2 text-white disabled:opacity-50"
-              >
-                {excluindo ? "Excluindo..." : "Excluir"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        aberto={!!perfilParaExcluir}
+        titulo="Excluir perfil?"
+        mensagem={
+          <>
+            O perfil <strong>{perfilParaExcluir?.nome}</strong> e todos os
+            botões e categorias dele serão apagados para sempre. Essa ação não
+            pode ser desfeita.
+          </>
+        }
+        textoConfirmar={excluindo ? "Excluindo..." : "Sim, excluir"}
+        perigo
+        carregando={excluindo}
+        erro={erroExclusao}
+        onConfirmar={excluirPerfil}
+        onCancelar={() => {
+          setPerfilParaExcluir(null);
+          setErroExclusao("");
+        }}
+      />
     </div>
   );
 }

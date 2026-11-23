@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { API_BASE_URL, getApiError } from "../../services/api";
+import { API_BASE_URL, getApiError } from "../../services/api";
+import { aviso } from "../../components/Aviso";
+import { Spinner } from "../../components/Carregando";
 
 export default function Cadastro() {
   const [form, setForm] = useState({
@@ -10,6 +12,7 @@ export default function Cadastro() {
     senha: "",
   });
 
+  const [enviando, setEnviando] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -20,7 +23,7 @@ export default function Cadastro() {
     e.preventDefault();
 
     if (form.senha.length < 8) {
-      alert("A senha deve ter pelo menos 8 caracteres.");
+      aviso("A senha deve ter pelo menos 8 caracteres.", "erro");
       return;
     }
 
@@ -30,6 +33,9 @@ export default function Cadastro() {
       senha: form.senha
     };
 
+    if (enviando) return;
+    setEnviando(true);
+
     try {
       const response = await fetch(`${API_BASE_URL}/usuarios`, {
         method: "POST",
@@ -38,18 +44,20 @@ export default function Cadastro() {
       });
 
       if (response.ok) {
-        alert("Cadastro realizado com sucesso!");
+        aviso("Cadastro realizado com sucesso!", "sucesso");
         navigate("/");
       } else {
         const mensagem = await getApiError(
           response,
           "Não foi possível realizar o cadastro."
         );
-        alert("Erro ao cadastrar: " + mensagem);
+        aviso("Erro ao cadastrar: " + mensagem, "erro");
       }
     } catch (error) {
       console.error("Erro ao cadastrar:", error);
-      alert("Não foi possível realizar o cadastro. Tente novamente.");
+      aviso("Não foi possível realizar o cadastro. Tente novamente.", "erro");
+    } finally {
+      setEnviando(false);
     }
   };
 
@@ -126,9 +134,11 @@ export default function Cadastro() {
 
           <button
             type="submit"
-            className="w-full bg-[#004687] text-white font-semibold py-2 rounded-lg hover:bg-[#003366] transition-all duration-200 shadow-md hover:shadow-lg"
+            disabled={enviando}
+            className="w-full flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait bg-[#004687] text-white font-semibold py-2 rounded-lg hover:bg-[#003366] transition-all duration-200 shadow-md hover:shadow-lg"
           >
-            Cadastrar
+            {enviando && <Spinner tamanho={18} />}
+            {enviando ? "Cadastrando..." : "Cadastrar"}
           </button>
         </form>
 

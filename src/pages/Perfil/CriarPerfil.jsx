@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_BASE_URL, getApiError } from "../../services/api";
+import { API_BASE_URL, getApiError } from "../../services/api";
+import { aviso } from "../../components/Aviso";
+import BotaoVoltar from "../../components/BotaoVoltar";
+import { Spinner } from "../../components/Carregando";
 
 export default function CriarPerfil() {
   const [nome, setNome] = useState("");
@@ -18,7 +21,7 @@ export default function CriarPerfil() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!nome || !fotoSelecionada) {
-      alert("Preencha o nome e escolha uma imagem");
+      aviso("Preencha o nome e escolha uma imagem", "erro");
       return;
     }
 
@@ -26,7 +29,7 @@ export default function CriarPerfil() {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      alert("Usuário não autenticado. Faça login novamente.");
+      aviso("Usuário não autenticado. Faça login novamente.", "erro");
       setLoading(false);
       navigate("/"); // volta pro login
       return;
@@ -45,23 +48,23 @@ export default function CriarPerfil() {
       });
 
       if (response.ok) {
-        alert("Perfil criado com sucesso!");
+        aviso("Perfil criado com sucesso!", "sucesso");
         setNome("");
         setFotoSelecionada(null);
         navigate("/meus-perfis"); // volta pra tela de perfis
       } else if (response.status === 401) {
-        alert("Usuário não autenticado. Faça login novamente.");
+        aviso("Usuário não autenticado. Faça login novamente.", "erro");
         navigate("/"); // volta pro login
       } else {
         const mensagem = await getApiError(
           response,
           "Não foi possível criar o perfil."
         );
-        alert("Erro ao criar perfil: " + mensagem);
+        aviso("Erro ao criar perfil: " + mensagem, "erro");
       }
     } catch (error) {
       console.error("Erro ao criar perfil:", error);
-      alert("Erro ao criar perfil. Tente novamente.");
+      aviso("Erro ao criar perfil. Tente novamente.", "erro");
     }
     setLoading(false);
   };
@@ -69,7 +72,10 @@ export default function CriarPerfil() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#b3daff] p-4">
       <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-white border-2 border-white/30">
-        <h1 className="text-3xl font-extrabold mb-6 text-center text-[#004687]">Criar Perfil</h1>
+        <div className="mb-6">
+            <BotaoVoltar onClick={() => navigate("/meus-perfis")} />
+            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">Criar Perfil</h1>
+          </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <input
@@ -99,8 +105,9 @@ export default function CriarPerfil() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg mt-4 text-white"
+            className="w-full flex items-center justify-center gap-2 bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg mt-4 text-white disabled:opacity-70 disabled:cursor-not-allowed"
           >
+            {loading && <Spinner tamanho={18} />}
             {loading ? "Criando..." : "Criar Perfil"}
           </button>
         </form>

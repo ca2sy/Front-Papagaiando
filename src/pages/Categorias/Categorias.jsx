@@ -3,13 +3,24 @@ import { useNavigate, useParams } from "react-router-dom";
 import HeaderPerfil from "../../components/HeaderPerfil.jsx";
 import SenhaModal from "../../components/SenhaModal.jsx";
 import BotaoFala from "../../components/BotaoFala.jsx";
-import { API_BASE_URL, getApiError } from "../../services/api";
+import { API_BASE_URL, getApiError } from "../../services/api";
+import { aviso } from "../../components/Aviso";
+import TituloSecao from "../../components/TituloSecao";
+import { lerCache, salvarCache } from "../../services/cache";
+import TelaCarregando from "../../components/Carregando";
+import ConfirmModal from "../../components/ConfirmModal";
+import { confirmar } from "../../components/confirmar";
 
 export default function CategoriasPage() {
-  const [categorias, setCategorias] = useState([]);
+  const { perfilId } = useParams();
+  const chaveCategorias = `categorias:${perfilId}`;
+  const chavePerfil = `perfil:${perfilId}`;
+
+  // Mostra na hora o que já estava salvo e atualiza em segundo plano
+  const [categorias, setCategorias] = useState(() => lerCache(chaveCategorias) || []);
   const [favoritos, setFavoritos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [perfil, setPerfil] = useState(null);
+  const [loading, setLoading] = useState(() => !lerCache(chaveCategorias));
+  const [perfil, setPerfil] = useState(() => lerCache(chavePerfil));
   const [showSenhaModal, setShowSenhaModal] = useState(false);
   const [acaoSelecionada, setAcaoSelecionada] = useState(null);
   const [categoriaParaExcluir, setCategoriaParaExcluir] = useState(null);
@@ -17,35 +28,30 @@ export default function CategoriasPage() {
   const [erroExclusao, setErroExclusao] = useState("");
 
   const navigate = useNavigate();
-  const { perfilId } = useParams();
 
   const carregarCategorias = useCallback(async () => {
     const token = localStorage.getItem("token");
 
-      if (!token || !perfilId) {
-        setLoading(false);
-        navigate(!token ? "/" : "/meus-perfis");
+    if (!token || !perfilId) {
+      setLoading(false);
+      navigate(!token ? "/" : "/meus-perfis");
       return;
     }
 
+    const headers = { Authorization: "Bearer " + token };
+
     try {
-      // Buscar perfil
-      const perfilResponse = await fetch(`${API_BASE_URL}/perfis/${perfilId}`, {
-        headers: { Authorization: "Bearer " + token }
-      });
+      // Perfil e categorias são buscados ao mesmo tempo
+      const [perfilResponse, categoriasResponse] = await Promise.all([
+        fetch(`${API_BASE_URL}/perfis/${perfilId}`, { headers }),
+        fetch(`${API_BASE_URL}/categorias/perfil/${perfilId}`, { headers }),
+      ]);
 
       if (perfilResponse.ok) {
         const perfilData = await perfilResponse.json();
         setPerfil(perfilData);
+        salvarCache(chavePerfil, perfilData);
       }
-
-      // Buscar categorias do perfil
-      const categoriasResponse = await fetch(
-        `${API_BASE_URL}/categorias/perfil/${perfilId}`,
-        {
-          headers: { Authorization: "Bearer " + token }
-        }
-      );
 
       if (categoriasResponse.ok) {
         const data = await categoriasResponse.json();
@@ -56,35 +62,33 @@ export default function CategoriasPage() {
         }));
 
         setCategorias(categoriasComFlag);
-
-        const favoritosSalvos =
-          JSON.parse(localStorage.getItem(`favoritos:${perfilId}`)) || [];
-
-        setFavoritos(favoritosSalvos);
-
       } else {
-         const mensagem = await getApiError(
+        const mensagem = await getApiError(
           categoriasResponse,
           "Não foi possível carregar as categorias."
         );
 
         console.error("Erro ao buscar categorias:", mensagem);
-        setCategorias([]);
 
         if (categoriasResponse.status === 401) {
           navigate("/");
         } else {
-          alert(mensagem);
+          aviso(mensagem, "erro");
         }
       }
 
     } catch (error) {
+      // Sem conexão: continua mostrando o que estava no cache
       console.error("Erro ao carregar categorias:", error);
-      setCategorias([]);
     } finally {
       setLoading(false);
     }
-  }, [perfilId, navigate]);
+  }, [perfilId, navigate, chavePerfil]);
+
+  // Mantém o cache igual ao que está na tela (inclui excluir/restaurar)
+  useEffect(() => {
+    if (!loading) salvarCache(chaveCategorias, categorias);
+  }, [categorias, loading, chaveCategorias]);
 
   useEffect(() => {
     carregarCategorias();
@@ -146,7 +150,17 @@ export default function CategoriasPage() {
   };
 
   const restaurarCategoria = async (categoria) => {
-    if (!window.confirm(`Restaurar "${categoria.nome}" para o padrão?`)) return;
+    const ok = await confirmar({
+      titulo: "Restaurar categoria?",
+      mensagem: (
+        <>
+          A categoria <strong>{categoria.nome}</strong> vai voltar a ser como
+          era originalmente. As alterações feitas nela serão perdidas.
+        </>
+      ),
+      textoConfirmar: "Restaurar",
+    });
+    if (!ok) return;
 
     const token = localStorage.getItem("token");
     if (!token) return navigate("/");
@@ -172,7 +186,7 @@ export default function CategoriasPage() {
         )
       );
     } catch (error) {
-      alert(error.message || "Erro ao restaurar categoria.");
+      aviso(error.message || "Erro ao restaurar categoria.", "erro");
     }
   };
 
@@ -183,7 +197,7 @@ export default function CategoriasPage() {
     const audio = new Audio(botao.urlAudio);
 
     audio.play().catch(() => {
-      alert("Não foi possível reproduzir o áudio.");
+      aviso("Não foi possível reproduzir o áudio.", "erro");
     });
   };
 
@@ -239,13 +253,7 @@ export default function CategoriasPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#b3daff] flex items-center justify-center">
-        <p className="text-xl text-blue-900">
-          Carregando categorias...
-        </p>
-      </div>
-    );
+    return <TelaCarregando texto="Carregando categorias..." />;
   }
 
   return (
@@ -259,9 +267,10 @@ export default function CategoriasPage() {
 
         {favoritos.length > 0 && (
           <>
-            <h2 className="text-2xl font-bold text-blue-900 mb-4">
-              Favoritos
-            </h2>
+            <TituloSecao
+              titulo="Favoritos"
+              subtitulo="Os botões que você mais usa"
+            />
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 mb-10">
               {favoritos.map(botao => (
@@ -276,20 +285,21 @@ export default function CategoriasPage() {
           </>
         )}
 
-        <h2 className="text-2xl font-bold text-blue-900 mb-4">
-          Categorias
-        </h2>
+        <TituloSecao
+          titulo="Categorias"
+          subtitulo="Toque em uma categoria para ver os botões"
+        />
 
         {categorias.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
             {categorias.map(categoria => (
-              <div key={categoria.id} className="relative">
+              <div key={categoria.id}>
                 <CategoriaCard
                   categoria={categoria}
                   onClick={handleCategoriaClick}
                 />
 
-                <div className="absolute top-2 right-2 flex gap-2">
+                <div className="mt-2 flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={() =>
@@ -297,7 +307,7 @@ export default function CategoriasPage() {
                         `/perfil/${perfilId}/categoria/${categoria.id}/editar`
                       )
                     }
-                    className="bg-white text-[#004687] rounded-lg px-3 py-2 shadow-md text-sm font-semibold"
+                    className="flex-1 min-w-0 rounded-lg bg-white px-2 py-2 text-xs sm:text-sm font-semibold text-[#004687] shadow-sm hover:bg-blue-50"
                     aria-label={`Editar categoria ${categoria.nome}`}
                   >
                     Editar
@@ -307,7 +317,7 @@ export default function CategoriasPage() {
                     <button
                       type="button"
                       onClick={() => restaurarCategoria(categoria)}
-                      className="rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#004687]"
+                      className="flex-1 min-w-0 rounded-lg bg-white px-2 py-2 text-xs sm:text-sm font-semibold text-[#004687] shadow-sm hover:bg-blue-50"
                     >
                       Restaurar
                     </button>
@@ -320,7 +330,7 @@ export default function CategoriasPage() {
                         setErroExclusao("");
                         setCategoriaParaExcluir(categoria);
                       }}
-                      className="bg-white text-red-600 rounded-lg px-3 py-2 shadow-md text-sm font-semibold"
+                      className="flex-1 min-w-0 rounded-lg bg-white px-2 py-2 text-xs sm:text-sm font-semibold text-red-600 shadow-sm hover:bg-red-50"
                       aria-label={`Excluir categoria ${categoria.nome}`}
                     >
                       Excluir
@@ -341,66 +351,29 @@ export default function CategoriasPage() {
         isOpen={showSenhaModal}
         onClose={() => setShowSenhaModal(false)}
         onConfirm={handleSenhaConfirmada}
-        titulo="Confirmar ação"
-        mensagem="Por favor, digite sua senha para continuar:"
+        titulo="Área do responsável"
+        mensagem="Para continuar, digite a senha da sua conta."
       />
 
-      {categoriaParaExcluir && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="titulo-exclusao"
-            aria-describedby="descricao-exclusao"
-            className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl"
-          >
-            <h2
-              id="titulo-exclusao"
-              className="text-xl font-bold text-[#004687] mb-3"
-            >
-              Excluir categoria?
-            </h2>
-
-            <p
-              id="descricao-exclusao"
-              className="text-gray-700 mb-4"
-            >
-              Deseja realmente excluir a categoria{" "}
-              <strong>{categoriaParaExcluir.nome}</strong>?
-              Esta ação não poderá ser desfeita.
-            </p>
-
-            {erroExclusao && (
-              <p role="alert" className="text-red-600 text-sm mb-4">
-                {erroExclusao}
-              </p>
-            )}
-
-            <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                disabled={excluindo}
-                onClick={() => {
-                  setCategoriaParaExcluir(null);
-                  setErroExclusao("");
-                }}
-                className="px-4 py-2 rounded-lg border border-[#004687] text-[#004687]"
-              >
-                Cancelar
-              </button>
-
-              <button
-                type="button"
-                disabled={excluindo}
-                onClick={excluirCategoria}
-                className="px-4 py-2 rounded-lg bg-red-600 text-white disabled:opacity-50"
-              >
-                {excluindo ? "Excluindo..." : "Excluir"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        aberto={!!categoriaParaExcluir}
+        titulo="Excluir categoria?"
+        mensagem={
+          <>
+            A categoria <strong>{categoriaParaExcluir?.nome}</strong> será
+            apagada para sempre. Essa ação não pode ser desfeita.
+          </>
+        }
+        textoConfirmar={excluindo ? "Excluindo..." : "Sim, excluir"}
+        perigo
+        carregando={excluindo}
+        erro={erroExclusao}
+        onConfirmar={excluirCategoria}
+        onCancelar={() => {
+          setCategoriaParaExcluir(null);
+          setErroExclusao("");
+        }}
+      />
     </div>
   );
 }
@@ -411,11 +384,11 @@ function CategoriaCard({ categoria, onClick }) {
       onClick={() => onClick(categoria)}
       className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-transform hover:scale-105 aspect-square flex flex-col"
     >
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 min-h-0 p-2 sm:p-3">
         <img
           src={categoria.urlImagem}
           alt={categoria.nome}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
           onError={(e) => {
             e.target.src =
               "https://via.placeholder.com/200?text=Sem+Imagem";

@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../../services/supabase";
 import { API_BASE_URL, getApiError } from "../../services/api";
+import { Spinner } from "../../components/Carregando";
+import BotaoVoltar from "../../components/BotaoVoltar";
 
-const SUPABASE_URL = "https://bkueynyjbvxuavboqnja.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdWV5bnlqYnZ4dWF2Ym9xbmphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwMzgwNzEsImV4cCI6MjA3MDYxNDA3MX0.c_9cK5NIgi9e-Tf-xRw3gDi2SJbyxPPb8lBj9Usvck0";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default function CriarBotao() {
   const [nome, setNome] = useState("");
@@ -301,27 +300,9 @@ export default function CriarBotao() {
     <div className="min-h-screen bg-[#b3daff] p-4">
       <div className="flex items-center justify-center min-h-screen">
         <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-[#004687] border-2 border-white/30">
-          <div className="flex items-center mb-6">
-            <button
-              onClick={handleVoltar}
-              className="text-[#004687] hover:text-blue-100 mr-4 disabled:opacity-50"
-              disabled={loading || gravando}
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-            <h1 className="text-3xl font-extrabold">Criar Botão</h1>
+          <div className="mb-6">
+            <BotaoVoltar onClick={handleVoltar} disabled={loading || gravando} />
+            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">Criar Botão</h1>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -359,7 +340,7 @@ export default function CriarBotao() {
                 ))}
               </select>
               {carregandoCategorias && (
-                <p className="text-sm text-white/80 mt-1">Carregando categorias...</p>
+                <p className="text-sm text-[#004687] mt-1 flex items-center gap-2"><Spinner tamanho={14} /> Carregando categorias...</p>
               )}
             </div>
 
@@ -385,7 +366,7 @@ export default function CriarBotao() {
                       <img
                         src={previewImagem}
                         alt="Preview"
-                        className="w-32 h-32 object-cover rounded-lg mx-auto"
+                        className="w-32 h-32 object-contain rounded-lg mx-auto"
                       />
                       <p className="text-sm text-[#004687]/80">
                         Clique para alterar imagem
@@ -547,8 +528,9 @@ export default function CriarBotao() {
             <button
               type="submit"
               disabled={loading || gravando || carregandoCategorias}
-              className="w-full bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed text-white"
+              className="w-full flex items-center justify-center gap-2 bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg disabled:opacity-70 disabled:cursor-not-allowed text-white"
             >
+              {loading && <Spinner tamanho={18} />}
               {loading ? "Criando botão..." : "Criar Botão"}
             </button>
           </form>

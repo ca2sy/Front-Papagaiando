@@ -1,7 +1,11 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_BASE_URL, getApiError } from "../../services/api";
+import { API_BASE_URL, getApiError } from "../../services/api";
+import { aviso } from "../../components/Aviso";
+import TelaCarregando, { Spinner } from "../../components/Carregando";
+import BotaoVoltar from "../../components/BotaoVoltar";
+import { confirmar } from "../../components/confirmar";
 
 export default function MinhaConta() {
   const navigate = useNavigate();
@@ -55,7 +59,7 @@ export default function MinhaConta() {
       if (!res.ok) throw new Error(await getApiError(res));
 
       setSenha("");
-      alert("Conta atualizada com sucesso!");
+      aviso("Conta atualizada com sucesso!", "sucesso");
     } catch (err) {
       setErro(err.message);
     } finally {
@@ -64,7 +68,14 @@ export default function MinhaConta() {
   };
 
   const excluir = async () => {
-    if (!window.confirm("Excluir sua conta permanentemente?")) return;
+    const ok = await confirmar({
+      titulo: "Excluir sua conta?",
+      mensagem:
+        "Sua conta, todos os perfis, categorias e botões serão apagados para sempre. Essa ação não pode ser desfeita.",
+      textoConfirmar: "Sim, excluir conta",
+      perigo: true,
+    });
+    if (!ok) return;
 
     try {
       const res = await fetch(`${API_BASE_URL}/usuarios/me`, {
@@ -82,14 +93,15 @@ export default function MinhaConta() {
     }
   };
 
-  if (loading) return <p className="p-8">Carregando conta...</p>;
+  if (loading) return <TelaCarregando texto="Carregando conta..." />;
 
   return (
     <main className="min-h-screen bg-[#b3daff] p-6">
       <div className="mx-auto max-w-md rounded-2xl bg-white p-6">
-        <h1 className="mb-6 text-2xl font-bold text-[#004687]">
-          Minha Conta
-        </h1>
+        <div className="mb-6">
+            <BotaoVoltar onClick={() => navigate("/meus-perfis")} />
+            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">Minha Conta</h1>
+          </div>
 
         <form onSubmit={salvar} className="space-y-4">
           <label className="block">
@@ -128,18 +140,12 @@ export default function MinhaConta() {
 
           <button
             disabled={salvando}
-            className="w-full rounded-lg bg-[#004687] p-3 text-white"
+            className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#004687] p-3 text-white disabled:opacity-70"
           >
+            {salvando && <Spinner tamanho={18} />}
             {salvando ? "Salvando..." : "Salvar alterações"}
           </button>
         </form>
-
-        <button
-          onClick={() => navigate("/meus-perfis")}
-          className="mt-4 w-full text-[#004687]"
-        >
-          Voltar
-        </button>
 
         <button
           onClick={excluir}

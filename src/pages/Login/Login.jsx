@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { API_BASE_URL, getApiError } from "../../services/api";
 import papagaiandoImg from "../../assets/papagaiando.jpg";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { aviso } from "../../components/Aviso";
+import { limparCache } from "../../services/cache";
+import { Spinner } from "../../components/Carregando";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", senha: "" });
+  const [enviando, setEnviando] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -13,6 +17,8 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (enviando) return;
+    setEnviando(true);
 
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -23,19 +29,22 @@ export default function Login() {
 
       if (!response.ok) {
         const mensagem = await getApiError(response, "Erro ao fazer login.");
-        alert(mensagem);
+        aviso(mensagem, "erro");
         return;
       }
 
       const data = await response.json();
+      limparCache();
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId);
-      alert(`Bem-vindo, ${data.nome}!`);
+      aviso(`Bem-vindo, ${data.nome}!`, "sucesso");
 
       navigate("/meus-perfis");
     } catch (err) {
       console.error("Erro na requisição:", err);
-      alert("Erro de conexão com o servidor");
+      aviso("Erro de conexão com o servidor", "erro");
+    } finally {
+      setEnviando(false);
     }
   };
 
@@ -85,9 +94,11 @@ export default function Login() {
 
             <button
               type="submit"
-              className="w-full bg-[#004687] text-white font-semibold py-3 rounded-lg hover:bg-[#003366] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              disabled={enviando}
+              className="w-full flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait bg-[#004687] text-white font-semibold py-3 rounded-lg hover:bg-[#003366] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
-              Entrar
+              {enviando && <Spinner tamanho={20} />}
+              {enviando ? "Entrando..." : "Entrar"}
             </button>
           </form>
 

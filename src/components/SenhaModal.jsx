@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { FiLock } from "react-icons/fi";
 import { API_BASE_URL, getApiError } from "../services/api";
+import { Spinner } from "./Carregando";
 
 
 export default function SenhaModal({ isOpen, onClose, onConfirm, titulo, mensagem }) {
@@ -49,7 +51,7 @@ export default function SenhaModal({ isOpen, onClose, onConfirm, titulo, mensage
       const data = await response.json();
 
       if (data.valido !== true) {
-        setErro("Senha incorreta.");
+        setErro("Senha incorreta. Tente novamente.");
         return;
       }
 
@@ -66,50 +68,86 @@ export default function SenhaModal({ isOpen, onClose, onConfirm, titulo, mensage
   };
 
   const handleClose = () => {
+    if (loading) return;
     setSenha("");
     setErro("");
     onClose();
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const aoTeclar = (e) => e.key === "Escape" && handleClose();
+    window.addEventListener("keydown", aoTeclar);
+    return () => window.removeEventListener("keydown", aoTeclar);
+  });
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-        <h3 className="text-lg font-bold text-blue-900 mb-2">{titulo}</h3>
-        <p className="text-gray-600 mb-4">{mensagem}</p>
-        
-        <input 
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4"
+      onClick={handleClose}
+    >
+      <form
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="senha-titulo"
+        onClick={(e) => e.stopPropagation()}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleConfirmar();
+        }}
+        className="aviso-entrada bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl text-center"
+      >
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#b3daff] text-[#004687]">
+          <FiLock size={26} />
+        </div>
+
+        <h3 id="senha-titulo" className="text-xl font-bold text-[#004687] mb-2">
+          {titulo}
+        </h3>
+        <p className="text-gray-600 mb-5">{mensagem}</p>
+
+        <input
           type="password"
           value={senha}
-          onChange={(e) => setSenha(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleConfirmar()}
-          className="w-full p-3 border border-gray-300 rounded-lg mb-2"
+          autoFocus
+          onChange={(e) => {
+            setSenha(e.target.value);
+            setErro("");
+          }}
+          className={`w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#004687]/50 border-2 focus:outline-none focus:ring-2 focus:ring-[#004687] ${
+            erro ? "border-red-400" : "border-[#004687]"
+          }`}
           placeholder="Digite sua senha"
+          aria-label="Senha"
+          aria-invalid={!!erro}
           disabled={loading}
         />
-        
-        {erro && (
-          <p className="text-red-600 text-sm mb-4">{erro}</p>
-        )}
-        
-        <div className="flex justify-end space-x-3">
-          <button 
+
+        <p role="alert" className="min-h-6 mt-2 mb-3 text-sm text-red-600">
+          {erro}
+        </p>
+
+        <div className="flex flex-col-reverse gap-3 sm:flex-row">
+          <button
+            type="button"
             onClick={handleClose}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            className="flex-1 rounded-lg border-2 border-[#004687] px-4 py-3 font-semibold text-[#004687] hover:bg-blue-50 disabled:opacity-50"
             disabled={loading}
           >
             Cancelar
           </button>
-          <button 
-            onClick={handleConfirmar}
-            className="px-4 py-2 bg-[#004687] text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300"
+          <button
+            type="submit"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#004687] px-4 py-3 font-semibold text-white hover:bg-[#003366] disabled:opacity-70"
             disabled={loading}
           >
-            {loading ? "Verificando..." : "Confirmar"}
+            {loading && <Spinner tamanho={18} />}
+            {loading ? "Verificando..." : "Continuar"}
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../../services/supabase";
 import { API_BASE_URL, getApiError } from "../../services/api";
+import { Spinner } from "../../components/Carregando";
+import BotaoVoltar from "../../components/BotaoVoltar";
 
 
-const SUPABASE_URL = "https://bkueynyjbvxuavboqnja.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdWV5bnlqYnZ4dWF2Ym9xbmphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwMzgwNzEsImV4cCI6MjA3MDYxNDA3MX0.c_9cK5NIgi9e-Tf-xRw3gDi2SJbyxPPb8lBj9Usvck0";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default function CriarCategoria() {
   const [nome, setNome] = useState("");
@@ -127,24 +126,9 @@ export default function CriarCategoria() {
     <div className="min-h-screen bg-[#b3daff] p-4">
       <div className="flex items-center justify-center min-h-screen">
         <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-[#004687] border-2 border-white/30">
-          <div className="relative flex items-center justify-center mb-6">
-             <button
-    type="button"
-    onClick={() => window.history.back()}
-    className="absolute left-0 p-2 rounded-full hover:bg-[#004687]/10 transition"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-6 w-6 text-[#004687]"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-    </svg>
-  </button>
-            <h1 className="text-3xl font-bold text-center text-[#004687]">Criar Categoria</h1>
+          <div className="mb-6">
+            <BotaoVoltar onClick={handleVoltar} disabled={loading} />
+            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">Criar Categoria</h1>
           </div>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -184,7 +168,7 @@ export default function CriarCategoria() {
                       <img
                         src={previewImagem}
                         alt="Preview"
-                        className="w-32 h-32 object-cover rounded-lg mx-auto"
+                        className="w-32 h-32 object-contain rounded-lg mx-auto"
                       />
                       <p className="text-sm text-[#004687]/80">
                         Clique para alterar imagem
@@ -246,8 +230,9 @@ export default function CriarCategoria() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed text-white"
+              className="w-full flex items-center justify-center gap-2 bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg disabled:opacity-70 disabled:cursor-not-allowed text-white"
             >
+              {loading && <Spinner tamanho={18} />}
               {loading ? "Criando categoria..." : "Criar Categoria"}
             </button>
           </form>
