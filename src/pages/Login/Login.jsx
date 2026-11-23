@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_BASE_URL, getApiError } from "../../services/api";
 import papagaiandoImg from "../../assets/papagaiando.jpg";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -14,15 +15,15 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/auth/login", {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        alert("Erro: " + errorData.error);
+        const mensagem = await getApiError(response, "Erro ao fazer login.");
+        alert(mensagem);
         return;
       }
 
