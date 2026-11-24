@@ -22,3 +22,152 @@
   .aviso-entrada,
   .aviso-topo { animation: none; }
 }
+
+/* ---------- Telas de login e cadastro ---------- */
+.fonte-marca {
+  font-family: "Poppins", system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.acesso {
+  --acesso-azul: #2a5bbd;
+  --acesso-claro: #f8f5f3;
+  --acesso-faixa: #dadada;
+  --acesso-tempo: 750ms;
+  --acesso-curva: cubic-bezier(0.65, 0, 0.35, 1);
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--acesso-azul);
+  font-family: "Poppins", system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Celular: logo em cima, formulário embaixo com a curva no topo */
+.acesso-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem 3.5rem;
+}
+
+.acesso-logo-cartao {
+  width: min(42vw, 11rem);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 22%;
+  background: #f1efed;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.35);
+}
+
+.acesso-logo-cartao img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.acesso-form {
+  position: relative;
+  background: var(--acesso-claro);
+  border-radius: 50% 50% 0 0 / 2.5rem 2.5rem 0 0;
+  box-shadow: 0 -0.9rem 0 var(--acesso-faixa);
+  flex: 1;
+  padding: 2.5rem 1.25rem 2.5rem;
+}
+
+.acesso-conteudo {
+  display: flex;
+  justify-content: center;
+}
+
+@keyframes acesso-entrada {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.acesso-entrada {
+  animation: acesso-entrada 450ms ease-out both;
+}
+
+/* Computador: lado a lado, e os painéis trocam de lado */
+@media (min-width: 1024px) {
+  .acesso-logo {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 40%;
+    padding: 0 0 0 2%;
+    transition: left var(--acesso-tempo) var(--acesso-curva),
+      padding var(--acesso-tempo) var(--acesso-curva);
+  }
+
+  .acesso[data-modo="cadastro"] .acesso-logo {
+    left: 60%;
+    padding: 0 2% 0 0;
+  }
+
+  .acesso-logo-cartao {
+    width: min(26vw, 24rem);
+  }
+
+  .acesso-form {
+    position: absolute;
+    z-index: 10;
+    top: -15%;
+    left: 40%;
+    width: 60%;
+    height: 130%;
+    min-height: 0;
+    padding: 0;
+    border-radius: 25% 0 0 25% / 50% 0 0 50%;
+    box-shadow: -4.5vw 0 0 var(--acesso-faixa);
+    transition: left var(--acesso-tempo) var(--acesso-curva),
+      border-radius var(--acesso-tempo) var(--acesso-curva),
+      box-shadow var(--acesso-tempo) var(--acesso-curva);
+  }
+
+  .acesso[data-modo="cadastro"] .acesso-form {
+    left: 0;
+    border-radius: 0 25% 25% 0 / 0 50% 50% 0;
+    box-shadow: 4.5vw 0 0 var(--acesso-faixa);
+  }
+
+  /* Área visível do painel (ele é mais alto que a tela por causa da curva) */
+  .acesso-conteudo {
+    position: absolute;
+    top: 11.5%;
+    bottom: 11.5%;
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+    padding: 2rem 5% 2rem 16%;
+    transition: padding var(--acesso-tempo) var(--acesso-curva);
+  }
+
+  .acesso[data-modo="cadastro"] .acesso-conteudo {
+    padding: 2rem 16% 2rem 5%;
+  }
+
+  /* Centraliza na vertical sem cortar o topo se o conteúdo for maior */
+  .acesso-conteudo > * {
+    margin-block: auto;
+  }
+
+  .acesso-entrada {
+    animation-delay: 300ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acesso-logo,
+  .acesso-form,
+  .acesso-conteudo {
+    transition: none;
+  }
+  .acesso-entrada {
+    animation: none;
+  }
+}

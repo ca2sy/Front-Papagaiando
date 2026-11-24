@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { API_BASE_URL, getApiError } from "../../services/api";
-
 import { aviso } from "../../components/Aviso";
 import { Spinner } from "../../components/Carregando";
+import {
+  classeRotulo,
+  classeCampo,
+  classeBotaoPrincipal,
+  classeLink,
+} from "../../components/TelaAcesso";
 
 export default function Cadastro() {
   const [form, setForm] = useState({
@@ -29,9 +34,9 @@ export default function Cadastro() {
     }
 
     const payload = {
-      nome: form.nome + " " + form.sobrenome,
-      email: form.email,
-      senha: form.senha
+      nome: `${form.nome.trim()} ${form.sobrenome.trim()}`,
+      email: form.email.trim(),
+      senha: form.senha,
     };
 
     if (enviando) return;
@@ -45,7 +50,7 @@ export default function Cadastro() {
       });
 
       if (response.ok) {
-        aviso("Cadastro realizado com sucesso!", "sucesso");
+        aviso("Cadastro realizado com sucesso! Agora é só entrar.", "sucesso");
         navigate("/", { replace: true });
       } else {
         const mensagem = await getApiError(
@@ -63,96 +68,100 @@ export default function Cadastro() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#b3daff] p-4">
-      <div className="bg-white backdrop-blur-md p-6 rounded-2xl shadow-xl w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center mb-4 text-[#004687]">
-          Cadastro
-        </h1>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <>
+      <h1 className="text-2xl font-semibold text-[#1f3f80]">Criar conta</h1>
+      <p className="mb-6 text-[#1f3f80]/70">
+        Leva menos de um minuto para começar.
+      </p>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium mb-1 text-[#004687]">
+            <label htmlFor="cad-nome" className={classeRotulo}>
               Nome
             </label>
             <input
+              id="cad-nome"
               type="text"
               name="nome"
               value={form.nome}
               onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#004687] bg-white text-sm"
-              placeholder="Digite seu nome"
+              autoComplete="given-name"
+              className={classeCampo}
+              placeholder="Seu nome"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1 text-[#004687]">
+            <label htmlFor="cad-sobrenome" className={classeRotulo}>
               Sobrenome
             </label>
             <input
+              id="cad-sobrenome"
               type="text"
               name="sobrenome"
               value={form.sobrenome}
               onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#004687] bg-white text-sm"
-              placeholder="Digite o sobrenome"
+              autoComplete="family-name"
+              className={classeCampo}
+              placeholder="Seu sobrenome"
               required
             />
           </div>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1 text-[#004687]">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#004687] bg-white text-sm"
-              placeholder="exemplo@email.com"
-              required
-            />
-          </div>
+        <div>
+          <label htmlFor="cad-email" className={classeRotulo}>
+            E-mail
+          </label>
+          <input
+            id="cad-email"
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            autoComplete="email"
+            className={classeCampo}
+            placeholder="exemplo@email.com"
+            required
+          />
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1 text-[#004687]">
-              Senha
-            </label>
-            <input
-              type="password"
-              name="senha"
-              value={form.senha}
-              onChange={handleChange}
-              className="w-full px-3 py-2 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-[#004687] border border-[#004687] bg-white text-sm"
-              placeholder="Mínimo 8 caracteres"
-              required
-            />
-            <p className="text-xs text-[#004687] mt-1">
-              Mínimo de 8 caracteres
-            </p>
-          </div>
+        <div>
+          <label htmlFor="cad-senha" className={classeRotulo}>
+            Senha
+          </label>
+          <input
+            id="cad-senha"
+            type="password"
+            name="senha"
+            value={form.senha}
+            onChange={handleChange}
+            autoComplete="new-password"
+            minLength={8}
+            aria-describedby="cad-senha-dica"
+            className={classeCampo}
+            placeholder="Crie uma senha"
+            required
+          />
+          <p id="cad-senha-dica" className="mt-1 text-xs text-[#1f3f80]/60">
+            Mínimo de 8 caracteres
+          </p>
+        </div>
 
-          <button
-            type="submit"
-            disabled={enviando}
-            className="w-full flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait bg-[#004687] text-white font-semibold py-2 rounded-lg hover:bg-[#003366] transition-all duration-200 shadow-md hover:shadow-lg"
-          >
-            {enviando && <Spinner tamanho={18} />}
-            <span>{enviando ? "Cadastrando..." : "Cadastrar"}</span>
-          </button>
-        </form>
+        <button type="submit" disabled={enviando} className={`${classeBotaoPrincipal} mt-2`}>
+          {enviando && <Spinner tamanho={18} />}
+          <span>{enviando ? "Cadastrando..." : "Cadastrar"}</span>
+        </button>
+      </form>
 
-        <p className="mt-4 text-center text-[#004687] text-sm">
-          Já tem uma conta?{" "}
-          <Link 
-            to="/" 
-            className="font-semibold underline hover:text-[#67B5DF] transition-colors"
-          >
-            Faça login
-          </Link>
-        </p>
-      </div>
-    </div>
+      <p className="mt-6 text-center text-[#1f3f80]/80">
+        Já tem uma conta?{" "}
+        <Link to="/" replace className={classeLink}>
+          Faça login
+        </Link>
+      </p>
+    </>
   );
 }

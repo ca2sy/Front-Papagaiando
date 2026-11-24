@@ -19,6 +19,7 @@ import RotaProtegida from "./components/RotaProtegida";
 import AvisoContainer from "./components/AvisoContainer";
 import { ConfirmacaoContainer } from "./components/ConfirmModal";
 import ErroTela from "./components/ErroTela";
+import TelaAcesso from "./components/TelaAcesso";
 
 createRoot(document.getElementById("root")).render(
 
@@ -27,8 +28,10 @@ createRoot(document.getElementById("root")).render(
       <AvisoContainer />
       <ConfirmacaoContainer />
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/cadastro" element={<Cadastro />} />
+        <Route element={<TelaAcesso />}>
+          <Route path="/" element={<Login />} />
+          <Route path="/cadastro" element={<Cadastro />} />
+        </Route>
 
         <Route element={<RotaProtegida />}>
         <Route path="/meus-perfis" element={<MeusPerfis />} />
