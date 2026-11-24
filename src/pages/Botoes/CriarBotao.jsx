@@ -6,8 +6,6 @@ import { Spinner } from "../../components/Carregando";
 import BotaoVoltar from "../../components/BotaoVoltar";
 import { useVoltar } from "../../services/navegacao";
 
-
-
 export default function CriarBotao() {
   const [nome, setNome] = useState("");
   const [imagemSelecionada, setImagemSelecionada] = useState(null);
@@ -18,14 +16,14 @@ export default function CriarBotao() {
   const [categorias, setCategorias] = useState([]);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState("");
   const [carregandoCategorias, setCarregandoCategorias] = useState(true);
-  
+
   // Estados para gravação de áudio
   const [gravando, setGravando] = useState(false);
   const [tempoGravacao, setTempoGravacao] = useState(0);
   const [audioBlob, setAudioBlob] = useState(null);
   const [audioUrl, setAudioUrl] = useState(null);
   const [permissaoAudio, setPermissaoAudio] = useState(false);
-  
+
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
   const intervaloRef = useRef(null);
@@ -38,11 +36,14 @@ export default function CriarBotao() {
     const carregarCategorias = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`${API_BASE_URL}/categorias/perfil/${perfilId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/categorias/perfil/${perfilId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
 
         if (response.ok) {
           const data = await response.json();
@@ -50,7 +51,7 @@ export default function CriarBotao() {
         } else {
           const mensagem = await getApiError(
             response,
-            "Não foi possível carregar as categorias."
+            "Não foi possível carregar as categorias.",
           );
 
           setErro(mensagem);
@@ -70,12 +71,16 @@ export default function CriarBotao() {
   useEffect(() => {
     const solicitarPermissaoAudio = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(track => track.stop()); // Para a stream imediatamente
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        stream.getTracks().forEach((track) => track.stop()); // Para a stream imediatamente
         setPermissaoAudio(true);
       } catch (error) {
         console.error("Erro ao solicitar permissão de áudio:", error);
-        setErro("Permissão de microfone negada. Você precisa permitir o acesso ao microfone para gravar áudios.");
+        setErro(
+          "Permissão de microfone negada. Você precisa permitir o acesso ao microfone para gravar áudios.",
+        );
         setPermissaoAudio(false);
       }
     };
@@ -111,13 +116,13 @@ export default function CriarBotao() {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: 'audio/wav' });
+        const blob = new Blob(chunksRef.current, { type: "audio/wav" });
         const url = URL.createObjectURL(blob);
         setAudioBlob(blob);
         setAudioUrl(url);
-        
+
         // Para todas as tracks da stream
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       };
 
       mediaRecorder.start();
@@ -126,9 +131,8 @@ export default function CriarBotao() {
 
       // Iniciar contador de tempo
       intervaloRef.current = setInterval(() => {
-        setTempoGravacao(tempo => tempo + 1);
+        setTempoGravacao((tempo) => tempo + 1);
       }, 1000);
-
     } catch (error) {
       console.error("Erro ao iniciar gravação:", error);
       setErro("Erro ao acessar o microfone. Verifique as permissões.");
@@ -139,7 +143,7 @@ export default function CriarBotao() {
     if (mediaRecorderRef.current && gravando) {
       mediaRecorderRef.current.stop();
       setGravando(false);
-      
+
       if (intervaloRef.current) {
         clearInterval(intervaloRef.current);
       }
@@ -149,14 +153,14 @@ export default function CriarBotao() {
   const formatarTempo = (segundos) => {
     const mins = Math.floor(segundos / 60);
     const secs = segundos % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   const limparGravacao = () => {
     setAudioBlob(null);
     setAudioUrl(null);
     setTempoGravacao(0);
-    
+
     if (audioUrl) {
       URL.revokeObjectURL(audioUrl);
     }
@@ -242,7 +246,7 @@ export default function CriarBotao() {
     if (!response.ok) {
       const mensagem = await getApiError(
         response,
-        "Não foi possível salvar o botão."
+        "Não foi possível salvar o botão.",
       );
 
       throw new Error(mensagem);
@@ -298,8 +302,13 @@ export default function CriarBotao() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-[#004687] border-2 border-white/30">
           <div className="mb-6">
-            <BotaoVoltar onClick={handleVoltar} disabled={loading || gravando} />
-            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">Criar Botão</h1>
+            <BotaoVoltar
+              onClick={handleVoltar}
+              disabled={loading || gravando}
+            />
+            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">
+              Criar Botão
+            </h1>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -337,7 +346,9 @@ export default function CriarBotao() {
                 ))}
               </select>
               {carregandoCategorias && (
-                <p className="text-sm text-[#004687] mt-1 flex items-center gap-2"><Spinner tamanho={14} /> Carregando categorias...</p>
+                <p className="text-sm text-[#004687] mt-1 flex items-center gap-2">
+                  <Spinner tamanho={14} /> Carregando categorias...
+                </p>
               )}
             </div>
 
@@ -354,10 +365,7 @@ export default function CriarBotao() {
                   id="imagem-input"
                   disabled={loading || gravando}
                 />
-                <label
-                  htmlFor="imagem-input"
-                  className="cursor-pointer block"
-                >
+                <label htmlFor="imagem-input" className="cursor-pointer block">
                   {previewImagem ? (
                     <div className="space-y-3">
                       <img
@@ -414,10 +422,11 @@ export default function CriarBotao() {
               <label className="block text-base font-medium mb-2 text-[#004687]">
                 Áudio do Botão
               </label>
-              
+
               {!permissaoAudio && (
                 <div className="bg-red-500/20 border border-red-400 text-[#004687] px-4 py-3 rounded-lg text-sm mb-4">
-                  Permissão de microfone necessária. Por favor, permita o acesso ao microfone no seu navegador.
+                  Permissão de microfone necessária. Por favor, permita o acesso
+                  ao microfone no seu navegador.
                 </div>
               )}
 
@@ -431,8 +440,16 @@ export default function CriarBotao() {
                       disabled={!permissaoAudio || loading}
                       className="flex items-center space-x-2 bg-[#004687] hover:bg-[#003366] text-white px-6 py-3 rounded-lg font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed transition"
                     >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       <span>Iniciar Gravação</span>
                     </button>
@@ -440,7 +457,9 @@ export default function CriarBotao() {
                     <div className="flex items-center space-x-4">
                       <div className="flex items-center space-x-2 bg-[#004687] text-white px-4 py-2 rounded-lg">
                         <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-                        <span className="font-mono">{formatarTempo(tempoGravacao)}</span>
+                        <span className="font-mono">
+                          {formatarTempo(tempoGravacao)}
+                        </span>
                       </div>
                       <button
                         type="button"
@@ -457,15 +476,27 @@ export default function CriarBotao() {
                 {audioUrl && (
                   <div className="bg-green-500/20 border border-green-400 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-white font-medium">Áudio gravado</span>
+                      <span className="text-white font-medium">
+                        Áudio gravado
+                      </span>
                       <button
                         type="button"
                         onClick={limparGravacao}
                         className="text-white/70 hover:text-white"
                         disabled={loading}
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -481,7 +512,9 @@ export default function CriarBotao() {
 
                 {/* Alternativa de upload */}
                 <div className="text-center">
-                  <p className="text-sm text-[#004687]/80 mb-2">Ou faça upload de um arquivo de áudio</p>
+                  <p className="text-sm text-[#004687]/80 mb-2">
+                    Ou faça upload de um arquivo de áudio
+                  </p>
                   <input
                     type="file"
                     accept="audio/*"
@@ -501,8 +534,16 @@ export default function CriarBotao() {
                     htmlFor="audio-upload"
                     className="inline-flex items-center space-x-2 bg-[#004687] hover:bg-[#003366] text-white px-4 py-2 rounded-lg cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed transition"
                   >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     <span>Upload de Áudio</span>
                   </label>

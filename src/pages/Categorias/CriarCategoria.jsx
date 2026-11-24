@@ -6,9 +6,6 @@ import { Spinner } from "../../components/Carregando";
 import BotaoVoltar from "../../components/BotaoVoltar";
 import { useVoltar } from "../../services/navegacao";
 
-
-
-
 export default function CriarCategoria() {
   const [nome, setNome] = useState("");
   const [imagemSelecionada, setImagemSelecionada] = useState(null);
@@ -79,7 +76,7 @@ export default function CriarCategoria() {
     if (!response.ok) {
       const mensagem = await getApiError(
         response,
-        "Não foi possível criar a categoria."
+        "Não foi possível criar a categoria.",
       );
 
       throw new Error(mensagem);
@@ -125,7 +122,9 @@ export default function CriarCategoria() {
         <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-[#004687] border-2 border-white/30">
           <div className="mb-6">
             <BotaoVoltar onClick={handleVoltar} disabled={loading} />
-            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">Criar Categoria</h1>
+            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">
+              Criar Categoria
+            </h1>
           </div>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -156,10 +155,7 @@ export default function CriarCategoria() {
                   id="imagem-input"
                   disabled={loading}
                 />
-                <label
-                  htmlFor="imagem-input"
-                  className="cursor-pointer block"
-                >
+                <label htmlFor="imagem-input" className="cursor-pointer block">
                   {previewImagem ? (
                     <div className="space-y-3">
                       <img
@@ -230,7 +226,9 @@ export default function CriarCategoria() {
               className="w-full flex items-center justify-center gap-2 bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg disabled:opacity-70 disabled:cursor-not-allowed text-white"
             >
               {loading && <Spinner tamanho={18} />}
-              <span>{loading ? "Criando categoria..." : "Criar Categoria"}</span>
+              <span>
+                {loading ? "Criando categoria..." : "Criar Categoria"}
+              </span>
             </button>
           </form>
         </div>

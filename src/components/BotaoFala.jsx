@@ -1,10 +1,22 @@
 import { useEffect, useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { SeloEditar } from "./ModoEdicao";
-import { alternarFavorito, ehFavorito, ouvirFavoritos } from "../services/favoritos";
+import {
+  alternarFavorito,
+  ehFavorito,
+  ouvirFavoritos,
+} from "../services/favoritos";
 
-export default function BotaoFala({ botao, onClick, perfilId, categoriaId, modoEdicao = false }) {
-  const [favoritado, setFavoritado] = useState(() => ehFavorito(perfilId, botao.id));
+export default function BotaoFala({
+  botao,
+  onClick,
+  perfilId,
+  categoriaId,
+  modoEdicao = false,
+}) {
+  const [favoritado, setFavoritado] = useState(() =>
+    ehFavorito(perfilId, botao.id),
+  );
 
   // Mantém o coração certo se o favorito mudar em outro lugar da tela
   useEffect(() => {
@@ -29,8 +41,7 @@ export default function BotaoFala({ botao, onClick, perfilId, categoriaId, modoE
           alt={botao.nome}
           className="w-full h-full object-contain p-2"
           onError={(e) => {
-            e.target.src =
-              "https://via.placeholder.com/200?text=📻";
+            e.target.src = "https://via.placeholder.com/200?text=📻";
           }}
         />
         {modoEdicao && <SeloEditar />}
@@ -45,7 +56,11 @@ export default function BotaoFala({ botao, onClick, perfilId, categoriaId, modoE
           <button
             type="button"
             onClick={toggleFavorito}
-            aria-label={favoritado ? `Tirar ${botao.nome} dos favoritos` : `Favoritar ${botao.nome}`}
+            aria-label={
+              favoritado
+                ? `Tirar ${botao.nome} dos favoritos`
+                : `Favoritar ${botao.nome}`
+            }
             aria-pressed={favoritado}
             className="ml-2 p-1 text-pink-500 text-lg transition-transform hover:scale-110"
           >

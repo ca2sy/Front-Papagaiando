@@ -34,8 +34,11 @@ export default function BotoesPage() {
   const [botoes, setBotoes] = useState(() => lerCache(chaveBotoes) || []);
   const [loading, setLoading] = useState(() => !lerCache(chaveBotoes));
   const [perfil, setPerfil] = useState(() => lerCache(chavePerfil));
-  const [categoria, setCategoria] = useState(() =>
-    (lerCache(`categorias:${perfilId}`) || []).find((c) => c.id === categoriaId) || null
+  const [categoria, setCategoria] = useState(
+    () =>
+      (lerCache(`categorias:${perfilId}`) || []).find(
+        (c) => c.id === categoriaId,
+      ) || null,
   );
   const [showSenhaModal, setShowSenhaModal] = useState(false);
   const [acaoSelecionada, setAcaoSelecionada] = useState(null);
@@ -58,14 +61,15 @@ export default function BotoesPage() {
 
     try {
       // Perfil, botões e categorias são buscados ao mesmo tempo
-      const [perfilResponse, botoesResponse, categoriasResponse] = await Promise.all([
-        fetch(`${API_BASE_URL}/perfis/${perfilId}`, { headers }),
-        fetch(
-          `${API_BASE_URL}/botoes/categoria/${categoriaId}?perfilId=${encodeURIComponent(perfilId)}`,
-          { headers }
-        ),
-        fetch(`${API_BASE_URL}/categorias/perfil/${perfilId}`, { headers }),
-      ]);
+      const [perfilResponse, botoesResponse, categoriasResponse] =
+        await Promise.all([
+          fetch(`${API_BASE_URL}/perfis/${perfilId}`, { headers }),
+          fetch(
+            `${API_BASE_URL}/botoes/categoria/${categoriaId}?perfilId=${encodeURIComponent(perfilId)}`,
+            { headers },
+          ),
+          fetch(`${API_BASE_URL}/categorias/perfil/${perfilId}`, { headers }),
+        ]);
 
       if (perfilResponse.ok) {
         const perfilData = await perfilResponse.json();
@@ -80,7 +84,7 @@ export default function BotoesPage() {
       } else {
         const mensagem = await getApiError(
           botoesResponse,
-          "Não foi possível carregar os botões."
+          "Não foi possível carregar os botões.",
         );
 
         console.error("Erro ao buscar botões:", mensagem);
@@ -97,7 +101,7 @@ export default function BotoesPage() {
         salvarCache(`categorias:${perfilId}`, todasCategorias);
 
         const categoriaEncontrada = todasCategorias.find(
-          c => c.id === categoriaId
+          (c) => c.id === categoriaId,
         );
 
         if (categoriaEncontrada) {
@@ -108,7 +112,6 @@ export default function BotoesPage() {
       } else {
         console.error("Erro ao buscar categorias:", categoriasResponse.status);
       }
-
     } catch (error) {
       // Sem conexão: continua mostrando o que estava no cache
       console.error("Erro ao carregar dados:", error);
@@ -148,7 +151,7 @@ export default function BotoesPage() {
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -159,16 +162,13 @@ export default function BotoesPage() {
       atualizarFavorito(perfilId, botao.id, restaurado);
 
       setBotoes((anteriores) =>
-        anteriores.map((item) =>
-          item.id === botao.id ? restaurado : item
-        )
+        anteriores.map((item) => (item.id === botao.id ? restaurado : item)),
       );
     } catch (error) {
       aviso(error.message || "Erro ao restaurar botão.", "erro");
     }
   };
 
-  
   const excluirBotao = async () => {
     if (!botaoParaExcluir || excluindo) return;
 
@@ -190,22 +190,17 @@ export default function BotoesPage() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
         throw new Error(
-          await getApiError(
-            response,
-            "Não foi possível excluir o botão."
-          )
+          await getApiError(response, "Não foi possível excluir o botão."),
         );
       }
 
       setBotoes((anteriores) =>
-        anteriores.filter(
-          (botao) => botao.id !== botaoParaExcluir.id
-        )
+        anteriores.filter((botao) => botao.id !== botaoParaExcluir.id),
       );
       removerFavorito(perfilId, botaoParaExcluir.id);
 
@@ -263,7 +258,7 @@ export default function BotoesPage() {
   const handleBotaoClick = (botao) => {
     if (editando) {
       navigate(
-        `/perfil/${perfilId}/categoria/${categoriaId}/botao/${botao.id}/editar`
+        `/perfil/${perfilId}/categoria/${categoriaId}/botao/${botao.id}/editar`,
       );
       return;
     }
@@ -271,11 +266,8 @@ export default function BotoesPage() {
     if (botao.urlAudio) {
       const audio = new Audio(botao.urlAudio);
 
-      audio.play().catch(error => {
-        console.error(
-          "Erro ao reproduzir áudio:",
-          error
-        );
+      audio.play().catch((error) => {
+        console.error("Erro ao reproduzir áudio:", error);
 
         aviso("Não foi possível reproduzir o áudio", "erro");
       });
@@ -299,7 +291,6 @@ export default function BotoesPage() {
       />
 
       <div className="p-4 sm:p-6 max-w-7xl mx-auto">
-
         {editando && (
           <BarraEdicao
             texto="Toque no botão que quer editar."
@@ -309,13 +300,10 @@ export default function BotoesPage() {
 
         {/* Cabeçalho */}
         <div className="flex items-center justify-between gap-3 mb-6">
-
           <BotaoVoltar onClick={handleVoltar} texto="Categorias" />
 
           <button
-            onClick={() =>
-              handleMenuClick("criar-botao")
-            }
+            onClick={() => handleMenuClick("criar-botao")}
             className="inline-flex items-center gap-2 rounded-full bg-[#004687] px-4 py-2 font-semibold text-white shadow-md hover:bg-[#003366] transition"
           >
             <FiPlus size={20} aria-hidden="true" />
@@ -336,7 +324,6 @@ export default function BotoesPage() {
         {/* Grid de botões */}
         {botoes.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
-
             {botoes.map((botao) => (
               <div key={botao.id} className="relative">
                 <BotaoFala
@@ -365,59 +352,52 @@ export default function BotoesPage() {
                 )}
               </div>
             ))}
-
           </div>
         ) : (
           <div className="text-center mt-12">
-
             <p className="text-blue-900 text-lg mb-4">
               Nenhum botão encontrado nesta categoria.
             </p>
 
             <button
-              onClick={() =>
-                handleMenuClick("criar-botao")
-              }
+              onClick={() => handleMenuClick("criar-botao")}
               className="bg-blue-600 hover:bg-[#004687] text-white px-6 py-2 rounded-lg font-medium"
             >
               Criar Primeiro Botão
             </button>
-
           </div>
         )}
       </div>
 
-        <ConfirmModal
-          aberto={!!botaoParaExcluir}
-          titulo="Excluir botão?"
-          mensagem={
-            <>
-              O botão <strong>{botaoParaExcluir?.nome}</strong> será apagado
-              para sempre. Essa ação não pode ser desfeita.
-            </>
-          }
-          textoConfirmar={excluindo ? "Excluindo..." : "Sim, excluir"}
-          perigo
-          carregando={excluindo}
-          erro={erroExclusao}
-          onConfirmar={excluirBotao}
-          onCancelar={() => {
-            setBotaoParaExcluir(null);
-            setErroExclusao("");
-          }}
-        />
+      <ConfirmModal
+        aberto={!!botaoParaExcluir}
+        titulo="Excluir botão?"
+        mensagem={
+          <>
+            O botão <strong>{botaoParaExcluir?.nome}</strong> será apagado para
+            sempre. Essa ação não pode ser desfeita.
+          </>
+        }
+        textoConfirmar={excluindo ? "Excluindo..." : "Sim, excluir"}
+        perigo
+        carregando={excluindo}
+        erro={erroExclusao}
+        onConfirmar={excluirBotao}
+        onCancelar={() => {
+          setBotaoParaExcluir(null);
+          setErroExclusao("");
+        }}
+      />
 
-        {erroExclusao && !botaoParaExcluir && (
-          <div role="alert" className="mx-auto max-w-xl p-4 text-red-700">
-            {erroExclusao}
-          </div>
-        )}
+      {erroExclusao && !botaoParaExcluir && (
+        <div role="alert" className="mx-auto max-w-xl p-4 text-red-700">
+          {erroExclusao}
+        </div>
+      )}
 
       <SenhaModal
         isOpen={showSenhaModal}
-        onClose={() =>
-          setShowSenhaModal(false)
-        }
+        onClose={() => setShowSenhaModal(false)}
         onConfirm={handleSenhaConfirmada}
         titulo="Área do responsável"
         mensagem="Para continuar, digite a senha da sua conta."

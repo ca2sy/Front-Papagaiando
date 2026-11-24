@@ -36,15 +36,15 @@ export default function EditarCategoria() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         if (!response.ok) {
           throw new Error(
             await getApiError(
               response,
-              "Não foi possível carregar a categoria."
-            )
+              "Não foi possível carregar a categoria.",
+            ),
           );
         }
 
@@ -102,15 +102,15 @@ export default function EditarCategoria() {
             nome: nome.trim(),
             urlImagem: imagemFinal,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
         throw new Error(
           await getApiError(
             response,
-            "Não foi possível atualizar a categoria."
-          )
+            "Não foi possível atualizar a categoria.",
+          ),
         );
       }
 
@@ -130,9 +130,11 @@ export default function EditarCategoria() {
     <div className="min-h-screen bg-[#b3daff] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md">
         <div className="mb-6">
-            <BotaoVoltar onClick={voltar} disabled={salvando} />
-            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">Editar Categoria</h1>
-          </div>
+          <BotaoVoltar onClick={voltar} disabled={salvando} />
+          <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">
+            Editar Categoria
+          </h1>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>

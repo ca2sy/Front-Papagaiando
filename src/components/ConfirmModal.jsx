@@ -51,7 +51,10 @@ export default function ConfirmModal({
           <Icone size={28} />
         </div>
 
-        <h2 id="confirm-titulo" className="mb-2 text-xl font-bold text-[#004687]">
+        <h2
+          id="confirm-titulo"
+          className="mb-2 text-xl font-bold text-[#004687]"
+        >
           {titulo}
         </h2>
 
@@ -60,7 +63,10 @@ export default function ConfirmModal({
         </div>
 
         {erro && (
-          <p role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+          <p
+            role="alert"
+            className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700"
+          >
             {erro}
           </p>
         )}
@@ -81,7 +87,9 @@ export default function ConfirmModal({
             disabled={carregando}
             onClick={onConfirmar}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 font-semibold text-white disabled:opacity-70 ${
-              perigo ? "bg-red-600 hover:bg-red-700" : "bg-[#004687] hover:bg-[#003366]"
+              perigo
+                ? "bg-red-600 hover:bg-red-700"
+                : "bg-[#004687] hover:bg-[#003366]"
             }`}
           >
             {carregando && <Spinner tamanho={18} />}

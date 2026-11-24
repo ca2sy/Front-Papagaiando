@@ -40,15 +40,12 @@ export default function EditarBotao() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         if (!response.ok) {
           throw new Error(
-            await getApiError(
-              response,
-              "Não foi possível carregar o botão."
-            )
+            await getApiError(response, "Não foi possível carregar o botão."),
           );
         }
 
@@ -112,15 +109,12 @@ export default function EditarBotao() {
             urlImagem: imagemFinal,
             urlAudio: audioFinal,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
         throw new Error(
-          await getApiError(
-            response,
-            "Não foi possível atualizar o botão."
-          )
+          await getApiError(response, "Não foi possível atualizar o botão."),
         );
       }
 
@@ -146,9 +140,11 @@ export default function EditarBotao() {
     <div className="min-h-screen bg-[#b3daff] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md">
         <div className="mb-6">
-            <BotaoVoltar onClick={voltar} disabled={salvando} />
-            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">Editar Botão</h1>
-          </div>
+          <BotaoVoltar onClick={voltar} disabled={salvando} />
+          <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">
+            Editar Botão
+          </h1>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>

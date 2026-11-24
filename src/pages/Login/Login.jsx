@@ -100,7 +100,11 @@ export default function Login() {
           />
         </div>
 
-        <button type="submit" disabled={enviando} className={`${classeBotaoPrincipal} mt-2`}>
+        <button
+          type="submit"
+          disabled={enviando}
+          className={`${classeBotaoPrincipal} mt-2`}
+        >
           {enviando && <Spinner tamanho={20} />}
           <span>{enviando ? "Entrando..." : "Entrar"}</span>
         </button>

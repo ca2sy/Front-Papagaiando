@@ -55,7 +55,7 @@ export default function Cadastro() {
       } else {
         const mensagem = await getApiError(
           response,
-          "Não foi possível realizar o cadastro."
+          "Não foi possível realizar o cadastro.",
         );
         aviso("Erro ao cadastrar: " + mensagem, "erro");
       }
@@ -150,7 +150,11 @@ export default function Cadastro() {
           </p>
         </div>
 
-        <button type="submit" disabled={enviando} className={`${classeBotaoPrincipal} mt-2`}>
+        <button
+          type="submit"
+          disabled={enviando}
+          className={`${classeBotaoPrincipal} mt-2`}
+        >
           {enviando && <Spinner tamanho={18} />}
           <span>{enviando ? "Cadastrando..." : "Cadastrar"}</span>
         </button>

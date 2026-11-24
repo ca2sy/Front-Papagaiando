@@ -50,7 +50,9 @@ export default function CampoImagem({
 
   const abaClasse = (ativa) =>
     `flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
-      ativa ? "bg-white text-[#004687] shadow" : "text-[#004687]/70 hover:text-[#004687]"
+      ativa
+        ? "bg-white text-[#004687] shadow"
+        : "text-[#004687]/70 hover:text-[#004687]"
     }`;
 
   return (
@@ -71,13 +73,18 @@ export default function CampoImagem({
           <div className="text-center text-[#004687]/60">
             <FiImage size={32} className="mx-auto mb-1" />
             <p className="text-sm">
-              {linkQuebrado ? "Não foi possível abrir esse link" : "Nenhuma imagem escolhida"}
+              {linkQuebrado
+                ? "Não foi possível abrir esse link"
+                : "Nenhuma imagem escolhida"}
             </p>
           </div>
         )}
       </div>
 
-      <div role="tablist" className="mb-3 flex gap-1 rounded-xl bg-[#b3daff]/40 p-1">
+      <div
+        role="tablist"
+        className="mb-3 flex gap-1 rounded-xl bg-[#b3daff]/40 p-1"
+      >
         <button
           type="button"
           role="tab"

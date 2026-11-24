@@ -16,10 +16,22 @@ export default function CriarPerfil() {
   const voltar = useVoltar("/meus-perfis");
 
   const imagensPapagaiando = [
-    { nome: "verde", url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-verd.jpg" },
-    { nome: "roxo", url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-roxo.jpg" },
-    { nome: "rosa", url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-rosa.jpg" },
-    { nome: "azul", url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-azul.jpg" }
+    {
+      nome: "verde",
+      url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-verd.jpg",
+    },
+    {
+      nome: "roxo",
+      url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-roxo.jpg",
+    },
+    {
+      nome: "rosa",
+      url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-rosa.jpg",
+    },
+    {
+      nome: "azul",
+      url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-azul.jpg",
+    },
   ];
 
   const handleSubmit = async (e) => {
@@ -46,9 +58,9 @@ export default function CriarPerfil() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
+          Authorization: "Bearer " + token,
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
@@ -62,7 +74,7 @@ export default function CriarPerfil() {
       } else {
         const mensagem = await getApiError(
           response,
-          "Não foi possível criar o perfil."
+          "Não foi possível criar o perfil.",
         );
         aviso("Erro ao criar perfil: " + mensagem, "erro");
       }
@@ -77,9 +89,11 @@ export default function CriarPerfil() {
     <div className="flex items-center justify-center min-h-screen bg-[#b3daff] p-4">
       <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-white border-2 border-white/30">
         <div className="mb-6">
-            <BotaoVoltar onClick={voltar} />
-            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">Criar Perfil</h1>
-          </div>
+          <BotaoVoltar onClick={voltar} />
+          <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">
+            Criar Perfil
+          </h1>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <input
@@ -91,7 +105,9 @@ export default function CriarPerfil() {
             required
           />
 
-          <p className="text-[#004687] font-semibold mt-2">Escolha uma imagem de perfil:</p>
+          <p className="text-[#004687] font-semibold mt-2">
+            Escolha uma imagem de perfil:
+          </p>
           <div className="flex flex-wrap gap-4 justify-center mt-2">
             {imagensPapagaiando.map((img, idx) => (
               <img
@@ -99,7 +115,9 @@ export default function CriarPerfil() {
                 src={img.url}
                 alt={img.nome}
                 className={`w-24 h-24 rounded-xl cursor-pointer border-2 transition-transform transform hover:scale-105 ${
-                  fotoSelecionada === img.url ? "border-[#004687]" : "border-[#004687]/50"
+                  fotoSelecionada === img.url
+                    ? "border-[#004687]"
+                    : "border-[#004687]/50"
                 }`}
                 onClick={() => setFotoSelecionada(img.url)}
               />

@@ -202,7 +202,11 @@ export default function MinhaConta() {
             </label>
           )}
 
-          {erro && <p role="alert" className="text-red-600">{erro}</p>}
+          {erro && (
+            <p role="alert" className="text-red-600">
+              {erro}
+            </p>
+          )}
 
           <button
             disabled={salvando}

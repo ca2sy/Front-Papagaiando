@@ -29,7 +29,9 @@ export default function CategoriasPage() {
   const chavePerfil = `perfil:${perfilId}`;
 
   // Mostra na hora o que já estava salvo e atualiza em segundo plano
-  const [categorias, setCategorias] = useState(() => lerCache(chaveCategorias) || []);
+  const [categorias, setCategorias] = useState(
+    () => lerCache(chaveCategorias) || [],
+  );
   const [favoritos, setFavoritos] = useState(() => lerFavoritos(perfilId));
   const [loading, setLoading] = useState(() => !lerCache(chaveCategorias));
   const [perfil, setPerfil] = useState(() => lerCache(chavePerfil));
@@ -69,9 +71,9 @@ export default function CategoriasPage() {
       if (categoriasResponse.ok) {
         const data = await categoriasResponse.json();
 
-        const categoriasComFlag = data.map(c => ({
+        const categoriasComFlag = data.map((c) => ({
           ...c,
-          isPadrao: c.padrao
+          isPadrao: c.padrao,
         }));
 
         setCategorias(categoriasComFlag);
@@ -79,7 +81,7 @@ export default function CategoriasPage() {
       } else {
         const mensagem = await getApiError(
           categoriasResponse,
-          "Não foi possível carregar as categorias."
+          "Não foi possível carregar as categorias.",
         );
 
         console.error("Erro ao buscar categorias:", mensagem);
@@ -90,7 +92,6 @@ export default function CategoriasPage() {
           aviso(mensagem, "erro");
         }
       }
-
     } catch (error) {
       // Sem conexão: continua mostrando o que estava no cache
       console.error("Erro ao carregar categorias:", error);
@@ -170,7 +171,7 @@ export default function CategoriasPage() {
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -181,15 +182,14 @@ export default function CategoriasPage() {
 
       setCategorias((anteriores) =>
         anteriores.map((item) =>
-          item.id === categoria.id ? restaurada : item
-        )
+          item.id === categoria.id ? restaurada : item,
+        ),
       );
     } catch (error) {
       aviso(error.message || "Erro ao restaurar categoria.", "erro");
     }
   };
 
-  
   const reproduzirFavorito = (botao) => {
     if (!botao.urlAudio) return;
 
@@ -229,13 +229,13 @@ export default function CategoriasPage() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
         const mensagem = await getApiError(
           response,
-          "Não foi possível excluir a categoria."
+          "Não foi possível excluir a categoria.",
         );
 
         throw new Error(mensagem);
@@ -243,7 +243,7 @@ export default function CategoriasPage() {
 
       setCategorias((anteriores) => {
         const restantes = anteriores.filter(
-          (categoria) => categoria.id !== categoriaParaExcluir.id
+          (categoria) => categoria.id !== categoriaParaExcluir.id,
         );
         sincronizarFavoritosDasCategorias(perfilId, restantes);
         return restantes;
@@ -270,7 +270,6 @@ export default function CategoriasPage() {
       />
 
       <div className="p-4 sm:p-6 max-w-7xl mx-auto">
-
         {editando && (
           <BarraEdicao
             texto="Toque na categoria que quer editar. Para editar botões, entre na categoria e use o menu."
@@ -286,7 +285,7 @@ export default function CategoriasPage() {
             />
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 mb-10">
-              {favoritos.map(botao => (
+              {favoritos.map((botao) => (
                 <BotaoFala
                   key={botao.id}
                   botao={botao}
@@ -309,7 +308,7 @@ export default function CategoriasPage() {
 
         {categorias.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
-            {categorias.map(categoria => (
+            {categorias.map((categoria) => (
               <div key={categoria.id} className="relative">
                 <CategoriaCard
                   categoria={categoria}
@@ -380,7 +379,9 @@ function CategoriaCard({ categoria, onClick, editando }) {
     <button
       type="button"
       onClick={() => onClick(categoria)}
-      aria-label={editando ? `Editar categoria ${categoria.nome}` : categoria.nome}
+      aria-label={
+        editando ? `Editar categoria ${categoria.nome}` : categoria.nome
+      }
       className="relative w-full text-left bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-transform hover:scale-105 aspect-square flex flex-col"
     >
       <div className="flex-1 min-h-0 p-2 sm:p-3">
@@ -389,8 +390,7 @@ function CategoriaCard({ categoria, onClick, editando }) {
           alt={categoria.nome}
           className="w-full h-full object-contain"
           onError={(e) => {
-            e.target.src =
-              "https://via.placeholder.com/200?text=Sem+Imagem";
+            e.target.src = "https://via.placeholder.com/200?text=Sem+Imagem";
           }}
         />
       </div>

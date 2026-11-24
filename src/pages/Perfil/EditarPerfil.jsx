@@ -18,10 +18,22 @@ export default function EditarPerfil() {
   const voltar = useVoltar(`/perfil/${perfilId}/categorias`);
 
   const imagensPapagaiando = [
-    { nome: "verde", url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-verd.jpg" },
-    { nome: "roxo", url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-roxo.jpg" },
-    { nome: "rosa", url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-rosa.jpg" },
-    { nome: "azul", url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-azul.jpg" }
+    {
+      nome: "verde",
+      url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-verd.jpg",
+    },
+    {
+      nome: "roxo",
+      url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-roxo.jpg",
+    },
+    {
+      nome: "rosa",
+      url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-rosa.jpg",
+    },
+    {
+      nome: "azul",
+      url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-azul.jpg",
+    },
   ];
 
   useEffect(() => {
@@ -34,7 +46,7 @@ export default function EditarPerfil() {
 
       try {
         const response = await fetch(`${API_BASE_URL}/perfis/${perfilId}`, {
-          headers: { Authorization: "Bearer " + token }
+          headers: { Authorization: "Bearer " + token },
         });
 
         if (response.ok) {
@@ -42,14 +54,16 @@ export default function EditarPerfil() {
           setNome(perfil.nome);
           setFotoSelecionada(perfil.urlFoto);
         } else {
-        const mensagem = await getApiError(
-          response,
-          "Não foi possível carregar o perfil."
-        );
+          const mensagem = await getApiError(
+            response,
+            "Não foi possível carregar o perfil.",
+          );
 
-        aviso(mensagem, "erro");
-        navigate(response.status === 401 ? "/" : "/meus-perfis", { replace: true });
-      }
+          aviso(mensagem, "erro");
+          navigate(response.status === 401 ? "/" : "/meus-perfis", {
+            replace: true,
+          });
+        }
       } catch (error) {
         console.error("Erro ao carregar perfil:", error);
         aviso("Erro ao carregar perfil", "erro");
@@ -84,9 +98,9 @@ export default function EditarPerfil() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
+          Authorization: "Bearer " + token,
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
@@ -98,7 +112,7 @@ export default function EditarPerfil() {
       } else {
         const mensagem = await getApiError(
           response,
-          "Não foi possível atualizar o perfil."
+          "Não foi possível atualizar o perfil.",
         );
 
         aviso("Erro ao atualizar perfil: " + mensagem, "erro");
@@ -120,9 +134,11 @@ export default function EditarPerfil() {
     <div className="flex items-center justify-center min-h-screen bg-[#b3daff] p-4">
       <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-[#004687] border-2 border-[#004687]/30">
         <div className="mb-6">
-            <BotaoVoltar onClick={handleVoltar} />
-            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">Editar Perfil</h1>
-          </div>
+          <BotaoVoltar onClick={handleVoltar} />
+          <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">
+            Editar Perfil
+          </h1>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <input
@@ -134,7 +150,9 @@ export default function EditarPerfil() {
             required
           />
 
-          <p className="text-[#004687] font-semibold mt-2">Escolha uma imagem de perfil:</p>
+          <p className="text-[#004687] font-semibold mt-2">
+            Escolha uma imagem de perfil:
+          </p>
           <div className="flex flex-wrap gap-4 justify-center mt-2">
             {imagensPapagaiando.map((img, idx) => (
               <img
@@ -142,7 +160,9 @@ export default function EditarPerfil() {
                 src={img.url}
                 alt={img.nome}
                 className={`w-24 h-24 rounded-xl cursor-pointer border-4 transition-transform transform hover:scale-105 ${
-                  fotoSelecionada === img.url ? "border-white" : "border-white/50"
+                  fotoSelecionada === img.url
+                    ? "border-white"
+                    : "border-white/50"
                 }`}
                 onClick={() => setFotoSelecionada(img.url)}
               />

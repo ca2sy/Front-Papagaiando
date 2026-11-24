@@ -44,7 +44,8 @@ export default function CampoAudio({
   useEffect(() => {
     return () => {
       clearInterval(timerRef.current);
-      if (recorderRef.current?.state === "recording") recorderRef.current.stop();
+      if (recorderRef.current?.state === "recording")
+        recorderRef.current.stop();
       streamRef.current?.getTracks().forEach((t) => t.stop());
     };
   }, []);
@@ -61,8 +62,13 @@ export default function CampoAudio({
   }, [gravando, segundos]);
 
   const iniciarGravacao = async () => {
-    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
-      onErro?.("Este navegador não permite gravar áudio. Use a opção de colar um link.");
+    if (
+      !navigator.mediaDevices?.getUserMedia ||
+      typeof MediaRecorder === "undefined"
+    ) {
+      onErro?.(
+        "Este navegador não permite gravar áudio. Use a opção de colar um link.",
+      );
       return;
     }
 
@@ -82,7 +88,9 @@ export default function CampoAudio({
         stream.getTracks().forEach((t) => t.stop());
         streamRef.current = null;
         if (pedacos.length) {
-          onGravacaoChange(new Blob(pedacos, { type: recorder.mimeType || "audio/webm" }));
+          onGravacaoChange(
+            new Blob(pedacos, { type: recorder.mimeType || "audio/webm" }),
+          );
         }
       };
 
@@ -97,7 +105,7 @@ export default function CampoAudio({
       onErro?.(
         error?.name === "NotAllowedError"
           ? "O microfone foi bloqueado. Libere o acesso nas configurações do navegador."
-          : "Não foi possível acessar o microfone."
+          : "Não foi possível acessar o microfone.",
       );
     }
   };
@@ -111,7 +119,9 @@ export default function CampoAudio({
 
   const abaClasse = (ativa) =>
     `flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
-      ativa ? "bg-white text-[#004687] shadow" : "text-[#004687]/70 hover:text-[#004687]"
+      ativa
+        ? "bg-white text-[#004687] shadow"
+        : "text-[#004687]/70 hover:text-[#004687]"
     }`;
 
   return (
@@ -135,7 +145,10 @@ export default function CampoAudio({
         )}
       </div>
 
-      <div role="tablist" className="mb-3 flex gap-1 rounded-xl bg-[#b3daff]/40 p-1">
+      <div
+        role="tablist"
+        className="mb-3 flex gap-1 rounded-xl bg-[#b3daff]/40 p-1"
+      >
         <button
           type="button"
           role="tab"
@@ -167,11 +180,15 @@ export default function CampoAudio({
               className="flex w-full flex-col items-center gap-1 rounded-xl border-2 border-red-600 bg-red-50 px-4 py-4 text-red-700 transition hover:bg-red-100"
             >
               <span className="flex items-center gap-2 font-semibold">
-                <span className="h-3 w-3 animate-pulse rounded-full bg-red-600" aria-hidden="true" />
+                <span
+                  className="h-3 w-3 animate-pulse rounded-full bg-red-600"
+                  aria-hidden="true"
+                />
                 Gravando… {formatarTempo(segundos)}
               </span>
               <span className="flex items-center gap-1 text-xs">
-                <FiSquare aria-hidden="true" /> Toque para parar (máx. {DURACAO_MAXIMA_S}s)
+                <FiSquare aria-hidden="true" /> Toque para parar (máx.{" "}
+                {DURACAO_MAXIMA_S}s)
               </span>
             </button>
           ) : (

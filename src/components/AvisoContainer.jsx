@@ -5,7 +5,11 @@ import { registrarOuvinteAviso } from "./Aviso";
 const DURACAO_MS = 2500;
 
 const estilos = {
-  sucesso: { icone: FiCheckCircle, cor: "text-green-600", barra: "bg-green-500" },
+  sucesso: {
+    icone: FiCheckCircle,
+    cor: "text-green-600",
+    barra: "bg-green-500",
+  },
   erro: { icone: FiAlertCircle, cor: "text-red-600", barra: "bg-red-500" },
   info: { icone: FiInfo, cor: "text-[#004687]", barra: "bg-[#004687]" },
 };

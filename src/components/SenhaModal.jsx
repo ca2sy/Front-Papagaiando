@@ -3,8 +3,13 @@ import { FiLock } from "react-icons/fi";
 import { API_BASE_URL, getApiError } from "../services/api";
 import { Spinner } from "./Carregando";
 
-
-export default function SenhaModal({ isOpen, onClose, onConfirm, titulo, mensagem }) {
+export default function SenhaModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  titulo,
+  mensagem,
+}) {
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
@@ -26,22 +31,19 @@ export default function SenhaModal({ isOpen, onClose, onConfirm, titulo, mensage
     setErro("");
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/auth/verificar-senha`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ senha }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/auth/verificar-senha`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ senha }),
+      });
 
       if (!response.ok) {
         const mensagem = await getApiError(
           response,
-          "Não foi possível verificar a senha."
+          "Não foi possível verificar a senha.",
         );
 
         setErro(mensagem);
@@ -58,7 +60,6 @@ export default function SenhaModal({ isOpen, onClose, onConfirm, titulo, mensage
       setSenha("");
       setErro("");
       onConfirm();
-
     } catch (error) {
       console.error("Erro ao verificar senha:", error);
       setErro("Erro de conexão com o servidor.");

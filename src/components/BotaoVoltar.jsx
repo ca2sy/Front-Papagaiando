@@ -1,7 +1,12 @@
 import { FiArrowLeft } from "react-icons/fi";
 
 // Botão de voltar padrão do site: seta + texto, bem visível.
-export default function BotaoVoltar({ onClick, texto = "Voltar", disabled = false, className = "" }) {
+export default function BotaoVoltar({
+  onClick,
+  texto = "Voltar",
+  disabled = false,
+  className = "",
+}) {
   return (
     <button
       type="button"
