@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { API_BASE_URL, getApiError } from "../../services/api";
+import { API_BASE_URL, getApiError } from "../../services/api";
+
 import { aviso } from "../../components/Aviso";
-import BotaoVoltar from "../../components/BotaoVoltar";
+import BotaoVoltar from "../../components/BotaoVoltar";
+import { useVoltar } from "../../services/navegacao";
+
 import TelaCarregando, { Spinner } from "../../components/Carregando";
 
 export default function EditarPerfil() {
@@ -12,6 +15,7 @@ export default function EditarPerfil() {
   const [carregando, setCarregando] = useState(true);
   const navigate = useNavigate();
   const { perfilId } = useParams();
+  const voltar = useVoltar(`/perfil/${perfilId}/categorias`);
 
   const imagensPapagaiando = [
     { nome: "verde", url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-verd.jpg" },
@@ -24,7 +28,7 @@ export default function EditarPerfil() {
     const buscarPerfil = async () => {
       const token = localStorage.getItem("token");
       if (!token || !perfilId) {
-        navigate("/");
+        navigate("/", { replace: true });
         return;
       }
 
@@ -44,7 +48,7 @@ export default function EditarPerfil() {
         );
 
         aviso(mensagem, "erro");
-        navigate(response.status === 401 ? "/" : "/meus-perfis");
+        navigate(response.status === 401 ? "/" : "/meus-perfis", { replace: true });
       }
       } catch (error) {
         console.error("Erro ao carregar perfil:", error);
@@ -70,7 +74,7 @@ export default function EditarPerfil() {
     if (!token) {
       aviso("Usuário não autenticado. Faça login novamente.", "erro");
       setLoading(false);
-      navigate("/");
+      navigate("/", { replace: true });
       return;
     }
 
@@ -87,10 +91,10 @@ export default function EditarPerfil() {
 
       if (response.ok) {
         aviso("Perfil atualizado com sucesso!", "sucesso");
-        navigate(`/perfil/${perfilId}/categorias`);
+        voltar();
       } else if (response.status === 401) {
         aviso("Usuário não autenticado. Faça login novamente.", "erro");
-        navigate("/");
+        navigate("/", { replace: true });
       } else {
         const mensagem = await getApiError(
           response,
@@ -106,9 +110,7 @@ export default function EditarPerfil() {
     setLoading(false);
   };
 
-  const handleVoltar = () => {
-    navigate(`/perfil/${perfilId}/categorias`);
-  };
+  const handleVoltar = voltar;
 
   if (carregando) {
     return <TelaCarregando texto="Carregando perfil..." />;
@@ -153,7 +155,7 @@ export default function EditarPerfil() {
             className="w-full flex items-center justify-center gap-2 bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg mt-4 text-white disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {loading && <Spinner tamanho={18} />}
-            {loading ? "Salvando..." : "Salvar Alterações"}
+            <span>{loading ? "Salvando..." : "Salvar Alterações"}</span>
           </button>
         </form>
       </div>

@@ -85,7 +85,7 @@ export default function ConfirmModal({
             }`}
           >
             {carregando && <Spinner tamanho={18} />}
-            {textoConfirmar}
+            <span>{textoConfirmar}</span>
           </button>
         </div>
       </div>

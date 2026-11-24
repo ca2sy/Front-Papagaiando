@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { API_BASE_URL, getApiError } from "../../services/api";
+import { API_BASE_URL, getApiError } from "../../services/api";
+
 import { aviso } from "../../components/Aviso";
 import { Spinner } from "../../components/Carregando";
 
@@ -45,7 +46,7 @@ export default function Cadastro() {
 
       if (response.ok) {
         aviso("Cadastro realizado com sucesso!", "sucesso");
-        navigate("/");
+        navigate("/", { replace: true });
       } else {
         const mensagem = await getApiError(
           response,
@@ -138,7 +139,7 @@ export default function Cadastro() {
             className="w-full flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait bg-[#004687] text-white font-semibold py-2 rounded-lg hover:bg-[#003366] transition-all duration-200 shadow-md hover:shadow-lg"
           >
             {enviando && <Spinner tamanho={18} />}
-            {enviando ? "Cadastrando..." : "Cadastrar"}
+            <span>{enviando ? "Cadastrando..." : "Cadastrar"}</span>
           </button>
         </form>
 

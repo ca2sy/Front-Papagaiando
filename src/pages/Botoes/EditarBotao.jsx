@@ -3,8 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { API_BASE_URL, getApiError } from "../../services/api";
 import TelaCarregando, { Spinner } from "../../components/Carregando";
 import BotaoVoltar from "../../components/BotaoVoltar";
+import { useVoltar } from "../../services/navegacao";
 import CampoImagem from "../../components/CampoImagem";
-import { enviarImagem } from "../../services/supabase";
+import { enviarImagem, enviarAudio } from "../../services/supabase";
+import CampoAudio from "../../components/CampoAudio";
+import { atualizarFavorito } from "../../services/favoritos";
 
 export default function EditarBotao() {
   const { perfilId, categoriaId, botaoId } = useParams();
@@ -14,20 +17,19 @@ export default function EditarBotao() {
   const [urlImagem, setUrlImagem] = useState("");
   const [arquivoImagem, setArquivoImagem] = useState(null);
   const [urlAudio, setUrlAudio] = useState("");
+  const [gravacaoAudio, setGravacaoAudio] = useState(null);
   const [loading, setLoading] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState("");
 
-  const voltar = () => {
-    navigate(`/perfil/${perfilId}/categoria/${categoriaId}`);
-  };
+  const voltar = useVoltar(`/perfil/${perfilId}/categoria/${categoriaId}`);
 
   useEffect(() => {
     const carregarBotao = async () => {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        navigate("/");
+        navigate("/", { replace: true });
         return;
       }
 
@@ -69,8 +71,13 @@ export default function EditarBotao() {
     e.preventDefault();
     setErro("");
 
-    if (!nome.trim() || (!urlImagem.trim() && !arquivoImagem) || !urlAudio.trim()) {
-      setErro("Preencha todos os campos.");
+    if (!nome.trim() || (!urlImagem.trim() && !arquivoImagem)) {
+      setErro("Preencha o nome e escolha uma imagem.");
+      return;
+    }
+
+    if (!urlAudio.trim() && !gravacaoAudio) {
+      setErro("Grave um áudio ou cole o link de um áudio.");
       return;
     }
 
@@ -80,13 +87,17 @@ export default function EditarBotao() {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        navigate("/");
+        navigate("/", { replace: true });
         return;
       }
 
       const imagemFinal = arquivoImagem
         ? await enviarImagem(`botoes/perfil-${perfilId}`, arquivoImagem)
         : urlImagem.trim();
+
+      const audioFinal = gravacaoAudio
+        ? await enviarAudio(`botoes/perfil-${perfilId}`, gravacaoAudio)
+        : urlAudio.trim();
 
       const response = await fetch(
         `${API_BASE_URL}/botoes/${botaoId}?perfilId=${encodeURIComponent(perfilId)}`,
@@ -99,7 +110,7 @@ export default function EditarBotao() {
           body: JSON.stringify({
             nome: nome.trim(),
             urlImagem: imagemFinal,
-            urlAudio: urlAudio.trim(),
+            urlAudio: audioFinal,
           }),
         }
       );
@@ -112,6 +123,12 @@ export default function EditarBotao() {
           )
         );
       }
+
+      atualizarFavorito(perfilId, botaoId, {
+        nome: nome.trim(),
+        urlImagem: imagemFinal,
+        urlAudio: audioFinal,
+      });
 
       voltar();
     } catch (error) {
@@ -165,32 +182,15 @@ export default function EditarBotao() {
             />
           </div>
 
-          <div>
-            <label
-              htmlFor="urlAudio"
-              className="block text-[#004687] font-medium mb-2"
-            >
-              URL do áudio
-            </label>
-
-            <input
-              id="urlAudio"
-              type="url"
-              value={urlAudio}
-              onChange={(e) => setUrlAudio(e.target.value)}
-              disabled={salvando}
-              required
-              className="w-full p-3 rounded-lg border-2 border-[#004687]"
-            />
-
-            {urlAudio && (
-              <audio
-                controls
-                src={urlAudio}
-                className="w-full mt-3"
-              />
-            )}
-          </div>
+          <CampoAudio
+            rotulo="Áudio do botão"
+            url={urlAudio}
+            onUrlChange={setUrlAudio}
+            gravacao={gravacaoAudio}
+            onGravacaoChange={setGravacaoAudio}
+            onErro={setErro}
+            disabled={salvando}
+          />
 
           {erro && (
             <p role="alert" className="text-red-600 text-sm">
@@ -214,7 +214,7 @@ export default function EditarBotao() {
               className="flex-1 flex items-center justify-center gap-2 p-3 rounded-lg bg-[#004687] text-white disabled:opacity-70"
             >
               {salvando && <Spinner tamanho={18} />}
-              {salvando ? "Salvando..." : "Salvar"}
+              <span>{salvando ? "Salvando..." : "Salvar"}</span>
             </button>
           </div>
         </form>

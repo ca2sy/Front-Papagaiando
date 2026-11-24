@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { API_BASE_URL, getApiError } from "../../services/api";
 import papagaiandoImg from "../../assets/papagaiando.jpg";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+
 import { aviso } from "../../components/Aviso";
 import { limparCache } from "../../services/cache";
 import { Spinner } from "../../components/Carregando";
@@ -10,6 +11,11 @@ export default function Login() {
   const [form, setForm] = useState({ email: "", senha: "" });
   const [enviando, setEnviando] = useState(false);
   const navigate = useNavigate();
+
+  // Já está logado: vai direto para os perfis
+  if (localStorage.getItem("token")) {
+    return <Navigate to="/meus-perfis" replace />;
+  }
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -39,7 +45,7 @@ export default function Login() {
       localStorage.setItem("userId", data.userId);
       aviso(`Bem-vindo, ${data.nome}!`, "sucesso");
 
-      navigate("/meus-perfis");
+      navigate("/meus-perfis", { replace: true });
     } catch (err) {
       console.error("Erro na requisição:", err);
       aviso("Erro de conexão com o servidor", "erro");
@@ -98,7 +104,7 @@ export default function Login() {
               className="w-full flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait bg-[#004687] text-white font-semibold py-3 rounded-lg hover:bg-[#003366] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
               {enviando && <Spinner tamanho={20} />}
-              {enviando ? "Entrando..." : "Entrar"}
+              <span>{enviando ? "Entrando..." : "Entrar"}</span>
             </button>
           </form>
 

@@ -1,51 +1,21 @@
 import { useEffect, useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { SeloEditar } from "./ModoEdicao";
+import { alternarFavorito, ehFavorito, ouvirFavoritos } from "../services/favoritos";
 
-export default function BotaoFala({ botao, onClick, perfilId }) {
-  const [favoritado, setFavoritado] = useState(false);
-  const chaveFavoritos = `favoritos:${perfilId}`;
+export default function BotaoFala({ botao, onClick, perfilId, categoriaId, modoEdicao = false }) {
+  const [favoritado, setFavoritado] = useState(() => ehFavorito(perfilId, botao.id));
 
+  // Mantém o coração certo se o favorito mudar em outro lugar da tela
   useEffect(() => {
-    const favoritosSalvos =
-      JSON.parse(localStorage.getItem(chaveFavoritos)) || [];
-
-    const jaFavoritado = favoritosSalvos.some(
-      (favorito) => favorito.id === botao.id
-    );
-
-    setFavoritado(jaFavoritado);
-  }, [botao.id, chaveFavoritos]);
+    const atualizar = () => setFavoritado(ehFavorito(perfilId, botao.id));
+    atualizar();
+    return ouvirFavoritos(atualizar);
+  }, [perfilId, botao.id]);
 
   const toggleFavorito = (e) => {
     e.stopPropagation();
-
-    const favoritosSalvos =
-      JSON.parse(localStorage.getItem(chaveFavoritos)) || [];
-
-    let novosFavoritos;
-
-    const jaFavoritado = favoritosSalvos.some(
-      (favorito) => favorito.id === botao.id
-    );
-
-    if (jaFavoritado) {
-      novosFavoritos = favoritosSalvos.filter(
-        (favorito) => favorito.id !== botao.id
-      );
-
-      setFavoritado(false);
-    } else {
-      novosFavoritos = [...favoritosSalvos, botao];
-
-      setFavoritado(true);
-    }
-
-    localStorage.setItem(
-      chaveFavoritos,
-      JSON.stringify(novosFavoritos)
-    );
-
-    window.dispatchEvent(new Event("favoritosAtualizados"));
+    setFavoritado(alternarFavorito(perfilId, botao, categoriaId));
   };
 
   return (
@@ -53,7 +23,7 @@ export default function BotaoFala({ botao, onClick, perfilId }) {
       className="flex flex-col items-center cursor-pointer group"
       onClick={() => onClick(botao)}
     >
-      <div className="w-full aspect-square bg-white rounded-xl shadow-lg overflow-hidden border-2 border-transparent group-hover:border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+      <div className="relative w-full aspect-square bg-white rounded-xl shadow-lg overflow-hidden border-2 border-transparent group-hover:border-blue-500 transition-all duration-300 hover:scale-105 hover:shadow-xl">
         <img
           src={botao.urlImagem}
           alt={botao.nome}
@@ -63,6 +33,7 @@ export default function BotaoFala({ botao, onClick, perfilId }) {
               "https://via.placeholder.com/200?text=📻";
           }}
         />
+        {modoEdicao && <SeloEditar />}
       </div>
 
       <div className="mt-3 flex items-center justify-between w-full">
@@ -70,12 +41,17 @@ export default function BotaoFala({ botao, onClick, perfilId }) {
           {botao.nome}
         </h3>
 
-        <button
-          onClick={toggleFavorito}
-          className="ml-2 text-pink-500 text-lg transition-transform hover:scale-110"
-        >
-          {favoritado ? <FaHeart /> : <FaRegHeart />}
-        </button>
+        {!modoEdicao && (
+          <button
+            type="button"
+            onClick={toggleFavorito}
+            aria-label={favoritado ? `Tirar ${botao.nome} dos favoritos` : `Favoritar ${botao.nome}`}
+            aria-pressed={favoritado}
+            className="ml-2 p-1 text-pink-500 text-lg transition-transform hover:scale-110"
+          >
+            {favoritado ? <FaHeart /> : <FaRegHeart />}
+          </button>
+        )}
       </div>
     </div>
   );

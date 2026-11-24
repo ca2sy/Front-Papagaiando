@@ -26,13 +26,13 @@ export default function AvisoContainer() {
   const { icone: Icone, cor, barra } = estilos[atual.tipo] ?? estilos.info;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none">
+    <div className="fixed inset-x-0 top-0 z-[100] flex justify-center p-4 pointer-events-none">
       <div
         key={atual.id}
         role="status"
         aria-live="polite"
         onClick={() => setAtual(null)}
-        className="aviso-entrada pointer-events-auto cursor-pointer bg-white rounded-2xl shadow-2xl border border-[#b3daff] w-full max-w-sm overflow-hidden"
+        className="aviso-topo pointer-events-auto cursor-pointer bg-white rounded-2xl shadow-2xl border border-[#b3daff] w-full max-w-sm overflow-hidden"
       >
         <div className="flex items-center gap-3 px-5 py-4">
           <Icone className={`${cor} shrink-0`} size={28} />

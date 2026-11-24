@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import HeaderPerfil from "../../components/HeaderPerfil.jsx";
 import SenhaModal from "../../components/SenhaModal.jsx";
 import BotaoFala from "../../components/BotaoFala.jsx";
-import { API_BASE_URL, getApiError } from "../../services/api";
+import { API_BASE_URL, getApiError } from "../../services/api";
+
 import { aviso } from "../../components/Aviso";
 import TituloSecao from "../../components/TituloSecao";
 import { FiPlus } from "react-icons/fi";
@@ -12,6 +13,17 @@ import BotaoVoltar from "../../components/BotaoVoltar";
 import TelaCarregando from "../../components/Carregando";
 import ConfirmModal from "../../components/ConfirmModal";
 import { confirmar } from "../../components/confirmar";
+import { useModoEdicao } from "../../services/navegacao";
+import {
+  atualizarFavorito,
+  removerFavorito,
+  sincronizarFavoritosDaCategoria,
+} from "../../services/favoritos";
+import {
+  BarraEdicao,
+  AcaoExcluir,
+  AcaoRestaurar,
+} from "../../components/ModoEdicao";
 
 export default function BotoesPage() {
   const { perfilId, categoriaId } = useParams();
@@ -27,12 +39,12 @@ export default function BotoesPage() {
   );
   const [showSenhaModal, setShowSenhaModal] = useState(false);
   const [acaoSelecionada, setAcaoSelecionada] = useState(null);
-  const [botaoParaEditar, setBotaoParaEditar] = useState(null);
   const [botaoParaExcluir, setBotaoParaExcluir] = useState(null);
   const [excluindo, setExcluindo] = useState(false);
   const [erroExclusao, setErroExclusao] = useState("");
 
   const navigate = useNavigate();
+  const [editando, setEditando] = useModoEdicao();
 
   const carregarDados = useCallback(async () => {
     const token = localStorage.getItem("token");
@@ -64,6 +76,7 @@ export default function BotoesPage() {
       if (botoesResponse.ok) {
         const todosBotoes = await botoesResponse.json();
         setBotoes(todosBotoes);
+        sincronizarFavoritosDaCategoria(perfilId, categoriaId, todosBotoes);
       } else {
         const mensagem = await getApiError(
           botoesResponse,
@@ -73,7 +86,7 @@ export default function BotoesPage() {
         console.error("Erro ao buscar botões:", mensagem);
 
         if (botoesResponse.status === 401) {
-          navigate("/");
+          navigate("/", { replace: true });
         } else {
           aviso(mensagem, "erro");
         }
@@ -127,7 +140,7 @@ export default function BotoesPage() {
     if (!ok) return;
 
     const token = localStorage.getItem("token");
-    if (!token) return navigate("/");
+    if (!token) return navigate("/", { replace: true });
 
     try {
       const response = await fetch(
@@ -143,6 +156,7 @@ export default function BotoesPage() {
       }
 
       const restaurado = await response.json();
+      atualizarFavorito(perfilId, botao.id, restaurado);
 
       setBotoes((anteriores) =>
         anteriores.map((item) =>
@@ -154,11 +168,6 @@ export default function BotoesPage() {
     }
   };
 
-  const handleEditarBotao = (botao) => {
-    setBotaoParaEditar(botao);
-    setAcaoSelecionada("editar-botao");
-    setShowSenhaModal(true);
-  };
   
   const excluirBotao = async () => {
     if (!botaoParaExcluir || excluindo) return;
@@ -166,7 +175,7 @@ export default function BotoesPage() {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      navigate("/");
+      navigate("/", { replace: true });
       return;
     }
 
@@ -198,6 +207,7 @@ export default function BotoesPage() {
           (botao) => botao.id !== botaoParaExcluir.id
         )
       );
+      removerFavorito(perfilId, botaoParaExcluir.id);
 
       setBotaoParaExcluir(null);
     } catch (error) {
@@ -207,7 +217,16 @@ export default function BotoesPage() {
     }
   };
 
+  const irParaCriarBotao = () => {
+    navigate(`/criar-botao/${perfilId}`, { state: { categoriaId } });
+  };
+
   const handleMenuClick = (acao) => {
+    // No modo edição a senha já foi confirmada
+    if (editando && acao === "criar-botao") {
+      irParaCriarBotao();
+      return;
+    }
     setAcaoSelecionada(acao);
     setShowSenhaModal(true);
   };
@@ -216,16 +235,16 @@ export default function BotoesPage() {
     setShowSenhaModal(false);
 
     switch (acaoSelecionada) {
+      case "modo-edicao":
+        setEditando(true);
+        break;
+
       case "editar-perfil":
         navigate(`/editar-perfil/${perfilId}`);
         break;
 
       case "criar-botao":
-        navigate(`/criar-botao/${perfilId}`, {
-          state: {
-            categoriaId: categoriaId
-          }
-        });
+        irParaCriarBotao();
         break;
 
       case "criar-categoria":
@@ -236,24 +255,19 @@ export default function BotoesPage() {
         navigate("/meus-perfis");
         break;
 
-      case "editar-botao":
-        if (botaoParaEditar) {
-          navigate(
-            `/perfil/${perfilId}/categoria/${categoriaId}/botao/${botaoParaEditar.id}/editar`
-          );
-        }
-        break;
-
-      case "excluir-botao":
-        excluirBotao();
-        break;
-
       default:
         break;
     }
   };
 
   const handleBotaoClick = (botao) => {
+    if (editando) {
+      navigate(
+        `/perfil/${perfilId}/categoria/${categoriaId}/botao/${botao.id}/editar`
+      );
+      return;
+    }
+
     if (botao.urlAudio) {
       const audio = new Audio(botao.urlAudio);
 
@@ -281,9 +295,17 @@ export default function BotoesPage() {
       <HeaderPerfil
         perfil={perfil}
         onMenuClick={handleMenuClick}
+        itemEdicao="Editar botões"
       />
 
       <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+
+        {editando && (
+          <BarraEdicao
+            texto="Toque no botão que quer editar."
+            onConcluir={() => setEditando(false)}
+          />
+        )}
 
         {/* Cabeçalho */}
         <div className="flex items-center justify-between gap-3 mb-6">
@@ -304,7 +326,11 @@ export default function BotoesPage() {
         <TituloSecao
           como="h1"
           titulo={categoria?.nome || "Botões"}
-          subtitulo="Toque em um botão para ouvir"
+          subtitulo={
+            editando
+              ? "Escolha o botão que você quer alterar"
+              : "Toque em um botão para ouvir"
+          }
         />
 
         {/* Grid de botões */}
@@ -317,42 +343,26 @@ export default function BotoesPage() {
                   botao={botao}
                   perfilId={perfilId}
                   onClick={handleBotaoClick}
+                  categoriaId={categoriaId}
+                  modoEdicao={editando}
                 />
 
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleEditarBotao(botao)}
-                    className="flex-1 min-w-0 rounded-lg bg-white px-2 py-2 text-xs sm:text-sm font-semibold text-[#004687] shadow-sm hover:bg-blue-50"
-                    aria-label={`Editar botão ${botao.nome}`}
-                  >
-                    Editar
-                  </button>
+                {editando && botao.padrao && botao.personalizado && (
+                  <AcaoRestaurar
+                    nome={botao.nome}
+                    onClick={() => restaurarBotao(botao)}
+                  />
+                )}
 
-                  {!botao.padrao && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setErroExclusao("");
-                        setBotaoParaExcluir(botao);
-                      }}
-                      className="flex-1 min-w-0 rounded-lg bg-white px-2 py-2 text-xs sm:text-sm font-semibold text-red-600 shadow-sm hover:bg-red-50"
-                      aria-label={`Excluir botão ${botao.nome}`}
-                    >
-                      Excluir
-                    </button>
-                  )}
-
-                  {botao.padrao && botao.personalizado && (
-                    <button
-                      type="button"
-                      onClick={() => restaurarBotao(botao)}
-                      className="flex-1 min-w-0 rounded-lg bg-white px-2 py-2 text-xs sm:text-sm font-semibold text-[#004687] shadow-sm hover:bg-blue-50"
-                    >
-                      Restaurar
-                      </button>
-                  )}
-                </div>
+                {editando && !botao.padrao && (
+                  <AcaoExcluir
+                    nome={botao.nome}
+                    onClick={() => {
+                      setErroExclusao("");
+                      setBotaoParaExcluir(botao);
+                    }}
+                  />
+                )}
               </div>
             ))}
 
@@ -390,10 +400,7 @@ export default function BotoesPage() {
           perigo
           carregando={excluindo}
           erro={erroExclusao}
-          onConfirmar={() => {
-            setAcaoSelecionada("excluir-botao");
-            setShowSenhaModal(true);
-          }}
+          onConfirmar={excluirBotao}
           onCancelar={() => {
             setBotaoParaExcluir(null);
             setErroExclusao("");

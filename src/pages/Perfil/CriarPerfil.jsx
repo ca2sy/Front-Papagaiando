@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_BASE_URL, getApiError } from "../../services/api";
+import { API_BASE_URL, getApiError } from "../../services/api";
+
 import { aviso } from "../../components/Aviso";
-import BotaoVoltar from "../../components/BotaoVoltar";
+import BotaoVoltar from "../../components/BotaoVoltar";
+import { useVoltar } from "../../services/navegacao";
+
 import { Spinner } from "../../components/Carregando";
 
 export default function CriarPerfil() {
@@ -10,6 +13,7 @@ export default function CriarPerfil() {
   const [fotoSelecionada, setFotoSelecionada] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const voltar = useVoltar("/meus-perfis");
 
   const imagensPapagaiando = [
     { nome: "verde", url: "https://bkueynyjbvxuavboqnja.supabase.co/storage/v1/object/public/perfil/papagaiando-verd.jpg" },
@@ -31,7 +35,7 @@ export default function CriarPerfil() {
     if (!token) {
       aviso("Usuário não autenticado. Faça login novamente.", "erro");
       setLoading(false);
-      navigate("/"); // volta pro login
+      navigate("/", { replace: true }); // volta pro login
       return;
     }
 
@@ -51,10 +55,10 @@ export default function CriarPerfil() {
         aviso("Perfil criado com sucesso!", "sucesso");
         setNome("");
         setFotoSelecionada(null);
-        navigate("/meus-perfis"); // volta pra tela de perfis
+        voltar();
       } else if (response.status === 401) {
         aviso("Usuário não autenticado. Faça login novamente.", "erro");
-        navigate("/"); // volta pro login
+        navigate("/", { replace: true }); // volta pro login
       } else {
         const mensagem = await getApiError(
           response,
@@ -73,7 +77,7 @@ export default function CriarPerfil() {
     <div className="flex items-center justify-center min-h-screen bg-[#b3daff] p-4">
       <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-white border-2 border-white/30">
         <div className="mb-6">
-            <BotaoVoltar onClick={() => navigate("/meus-perfis")} />
+            <BotaoVoltar onClick={voltar} />
             <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">Criar Perfil</h1>
           </div>
 
@@ -108,7 +112,7 @@ export default function CriarPerfil() {
             className="w-full flex items-center justify-center gap-2 bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg mt-4 text-white disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {loading && <Spinner tamanho={18} />}
-            {loading ? "Criando..." : "Criar Perfil"}
+            <span>{loading ? "Criando..." : "Criar Perfil"}</span>
           </button>
         </form>
       </div>

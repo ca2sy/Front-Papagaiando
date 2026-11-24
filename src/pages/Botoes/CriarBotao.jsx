@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { supabase } from "../../services/supabase";
 import { API_BASE_URL, getApiError } from "../../services/api";
 import { Spinner } from "../../components/Carregando";
 import BotaoVoltar from "../../components/BotaoVoltar";
+import { useVoltar } from "../../services/navegacao";
 
 
 
@@ -29,8 +30,8 @@ export default function CriarBotao() {
   const chunksRef = useRef([]);
   const intervaloRef = useRef(null);
 
-  const navigate = useNavigate();
   const { perfilId } = useParams();
+  const voltar = useVoltar(`/perfil/${perfilId}/categorias`);
 
   // Carregar categorias do perfil
   useEffect(() => {
@@ -178,9 +179,7 @@ export default function CriarBotao() {
     }
   };
 
-  const handleVoltar = () => {
-    navigate(`/perfil/${perfilId}/categorias`);
-  };
+  const handleVoltar = voltar;
 
   const uploadImagemSupabase = async (arquivo) => {
     const nomeArquivo = `${Date.now()}_${arquivo.name}`;
@@ -285,9 +284,7 @@ export default function CriarBotao() {
       await salvarBotaoBackend(urlImagem, urlAudio);
 
       setSucesso(true);
-      setTimeout(() => {
-        navigate(`/perfil/${perfilId}/categorias`);
-      }, 1500);
+      setTimeout(voltar, 1500);
     } catch (error) {
       console.error("Erro:", error);
       setErro(error.message || "Erro ao criar botão. Tente novamente.");
@@ -531,7 +528,7 @@ export default function CriarBotao() {
               className="w-full flex items-center justify-center gap-2 bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg disabled:opacity-70 disabled:cursor-not-allowed text-white"
             >
               {loading && <Spinner tamanho={18} />}
-              {loading ? "Criando botão..." : "Criar Botão"}
+              <span>{loading ? "Criando botão..." : "Criar Botão"}</span>
             </button>
           </form>
         </div>

@@ -20,3 +20,22 @@ export async function enviarImagem(pasta, arquivo) {
 
   return supabase.storage.from(BUCKET_IMAGENS).getPublicUrl(caminho).data.publicUrl;
 }
+
+const BUCKET_AUDIOS = "papagaiando-audios";
+
+// Envia um áudio gravado (Blob) para o Storage e devolve a URL pública.
+export async function enviarAudio(pasta, blob) {
+  const tipo = blob.type || "audio/webm";
+  const extensao = tipo.includes("mp4") ? "m4a" : tipo.includes("ogg") ? "ogg" : "webm";
+  const caminho = `${pasta}/${Date.now()}_gravacao.${extensao}`;
+
+  const { error } = await supabase.storage
+    .from(BUCKET_AUDIOS)
+    .upload(caminho, blob, { contentType: tipo });
+
+  if (error) {
+    throw new Error(`Erro ao fazer upload do áudio: ${error.message}`);
+  }
+
+  return supabase.storage.from(BUCKET_AUDIOS).getPublicUrl(caminho).data.publicUrl;
+}

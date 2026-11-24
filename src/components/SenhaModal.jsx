@@ -144,7 +144,7 @@ export default function SenhaModal({ isOpen, onClose, onConfirm, titulo, mensage
             disabled={loading}
           >
             {loading && <Spinner tamanho={18} />}
-            {loading ? "Verificando..." : "Continuar"}
+            <span>{loading ? "Verificando..." : "Continuar"}</span>
           </button>
         </div>
       </form>

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { API_BASE_URL, getApiError } from "../../services/api";
 import TelaCarregando, { Spinner } from "../../components/Carregando";
 import BotaoVoltar from "../../components/BotaoVoltar";
+import { useVoltar } from "../../services/navegacao";
 import CampoImagem from "../../components/CampoImagem";
 import { enviarImagem } from "../../services/supabase";
 
@@ -17,16 +18,14 @@ export default function EditarCategoria() {
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState("");
 
-  const voltar = () => {
-    navigate(`/perfil/${perfilId}/categorias`);
-  };
+  const voltar = useVoltar(`/perfil/${perfilId}/categorias`);
 
   useEffect(() => {
     const carregarCategoria = async () => {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        navigate("/");
+        navigate("/", { replace: true });
         return;
       }
 
@@ -83,7 +82,7 @@ export default function EditarCategoria() {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        navigate("/");
+        navigate("/", { replace: true });
         return;
       }
 
@@ -188,7 +187,7 @@ export default function EditarCategoria() {
               className="flex-1 flex items-center justify-center gap-2 p-3 rounded-lg bg-[#004687] text-white disabled:opacity-70"
             >
               {salvando && <Spinner tamanho={18} />}
-              {salvando ? "Salvando..." : "Salvar"}
+              <span>{salvando ? "Salvando..." : "Salvar"}</span>
             </button>
           </div>
         </form>

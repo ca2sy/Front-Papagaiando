@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { supabase } from "../../services/supabase";
 import { API_BASE_URL, getApiError } from "../../services/api";
 import { Spinner } from "../../components/Carregando";
 import BotaoVoltar from "../../components/BotaoVoltar";
+import { useVoltar } from "../../services/navegacao";
 
 
 
@@ -16,8 +17,8 @@ export default function CriarCategoria() {
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState(false);
 
-  const navigate = useNavigate();
   const { perfilId } = useParams();
+  const voltar = useVoltar(`/perfil/${perfilId}/categorias`);
 
   const handleImagemChange = (e) => {
     const arquivo = e.target.files[0];
@@ -36,9 +37,7 @@ export default function CriarCategoria() {
     }
   };
 
-  const handleVoltar = () => {
-    navigate(`/perfil/${perfilId}/categorias`);
-  };
+  const handleVoltar = voltar;
 
   const uploadImagemSupabase = async (arquivo) => {
     const nomeArquivo = `${Date.now()}_${arquivo.name}`;
@@ -111,9 +110,7 @@ export default function CriarCategoria() {
       await salvarCategoriaBackend(urlImagem);
 
       setSucesso(true);
-      setTimeout(() => {
-        navigate(`/perfil/${perfilId}/categorias`);
-      }, 1500);
+      setTimeout(voltar, 1500);
     } catch (error) {
       console.error("Erro:", error);
       setErro(error.message || "Erro ao criar categoria. Tente novamente.");
@@ -233,7 +230,7 @@ export default function CriarCategoria() {
               className="w-full flex items-center justify-center gap-2 bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg disabled:opacity-70 disabled:cursor-not-allowed text-white"
             >
               {loading && <Spinner tamanho={18} />}
-              {loading ? "Criando categoria..." : "Criar Categoria"}
+              <span>{loading ? "Criando categoria..." : "Criar Categoria"}</span>
             </button>
           </form>
         </div>

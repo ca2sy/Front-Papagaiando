@@ -18,9 +18,11 @@ import MinhaConta from "./pages/Perfil/MinhaConta";
 import RotaProtegida from "./components/RotaProtegida";
 import AvisoContainer from "./components/AvisoContainer";
 import { ConfirmacaoContainer } from "./components/ConfirmModal";
+import ErroTela from "./components/ErroTela";
 
 createRoot(document.getElementById("root")).render(
 
+  <ErroTela>
     <BrowserRouter>
       <AvisoContainer />
       <ConfirmacaoContainer />
@@ -42,5 +44,6 @@ createRoot(document.getElementById("root")).render(
         </Route>
       </Routes>
     </BrowserRouter>
+  </ErroTela>
 
 );

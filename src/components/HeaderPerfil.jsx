@@ -8,9 +8,11 @@ import {
   FiFolderPlus,
   FiUsers,
   FiLogOut,
+  FiSliders,
 } from "react-icons/fi";
 import papagaiandoImg from "../assets/papagaiando.jpg";
-import { limparCache } from "../services/cache";
+import { sairDaConta } from "../services/auth";
+import SenhaModal from "./SenhaModal";
 
 const itensMenu = [
   { acao: "criar-botao", texto: "Criar botão", icone: FiPlusSquare },
@@ -19,9 +21,18 @@ const itensMenu = [
   { acao: "sair", texto: "Trocar de perfil", icone: FiUsers },
 ];
 
-export default function HeaderPerfil({ perfil, onMenuClick }) {
+// itemEdicao: texto do item "modo edição" desta tela (ex.: "Editar categorias").
+export default function HeaderPerfil({ perfil, onMenuClick, itemEdicao }) {
   const [menuAberto, setMenuAberto] = useState(false);
+  const [pedindoSenha, setPedindoSenha] = useState(false);
   const navigate = useNavigate();
+
+  const itens = itemEdicao
+    ? [
+        { acao: "modo-edicao", texto: itemEdicao, icone: FiSliders },
+        ...itensMenu,
+      ]
+    : itensMenu;
 
   useEffect(() => {
     if (!menuAberto) return;
@@ -34,17 +45,15 @@ export default function HeaderPerfil({ perfil, onMenuClick }) {
     setMenuAberto(false);
 
     if (acao === "sair-conta") {
-      localStorage.removeItem("token");
-      localStorage.removeItem("userId");
-      sessionStorage.clear();
-      limparCache();
+      sairDaConta();
 
-      navigate("/");
+      navigate("/", { replace: true });
       return;
     }
 
     if (acao === "sair") {
-      navigate("/meus-perfis");
+      // Trocar de perfil exige a senha da conta
+      setPedindoSenha(true);
       return;
     }
 
@@ -126,7 +135,7 @@ export default function HeaderPerfil({ perfil, onMenuClick }) {
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3">
-          {itensMenu.map((item) => (
+          {itens.map((item) => (
             <button
               key={item.acao}
               onClick={() => handleMenuClick(item.acao)}
@@ -150,6 +159,17 @@ export default function HeaderPerfil({ perfil, onMenuClick }) {
           </button>
         </div>
       </aside>
+
+      <SenhaModal
+        isOpen={pedindoSenha}
+        titulo="Trocar de perfil"
+        mensagem="Digite a senha da conta para trocar de perfil."
+        onClose={() => setPedindoSenha(false)}
+        onConfirm={() => {
+          setPedindoSenha(false);
+          navigate("/meus-perfis");
+        }}
+      />
     </header>
   );
 }
