@@ -63,7 +63,7 @@ export default function HeaderPerfil({ perfil, onMenuClick, itemEdicao }) {
   };
 
   return (
-    <header className="bg-[#004280] shadow-md sticky top-0 z-40">
+    <header className="bg-[#365FB3] shadow-md sticky top-0 z-40">
       <div className="flex justify-between items-center px-3 sm:px-5 py-3">
         <div className="flex items-center min-w-0">
           <img
@@ -111,7 +111,7 @@ export default function HeaderPerfil({ perfil, onMenuClick, itemEdicao }) {
           menuAberto ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between bg-[#004280] px-4 py-4 text-white">
+        <div className="flex items-center justify-between bg-[#365FB3] px-4 py-4 text-white">
           <div className="flex items-center gap-3 min-w-0">
             {perfil?.urlFoto && (
               <img

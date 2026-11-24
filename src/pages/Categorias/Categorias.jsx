@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import HeaderPerfil from "../../components/HeaderPerfil.jsx";
 import SenhaModal from "../../components/SenhaModal.jsx";
@@ -40,6 +40,30 @@ export default function CategoriasPage() {
   const [categoriaParaExcluir, setCategoriaParaExcluir] = useState(null);
   const [excluindo, setExcluindo] = useState(false);
   const [erroExclusao, setErroExclusao] = useState("");
+  const [pagina, setPagina] = useState(1);
+  const carrosselRef = useRef(null);
+  const categoriasPorPagina = 8;
+
+  const moverCarrossel = (direcao) => {
+    if (!carrosselRef.current) return;
+
+    carrosselRef.current.scrollBy({
+      left: carrosselRef.current.clientWidth * direcao,
+      behavior: "smooth",
+    });
+  };
+
+  const totalPaginas = Math.max(
+    1,
+    Math.ceil(categorias.length / categoriasPorPagina),
+  );
+
+  const paginaAtual = Math.min(pagina, totalPaginas);
+
+  const categoriasVisiveis = categorias.slice(
+    (paginaAtual - 1) * categoriasPorPagina,
+    paginaAtual * categoriasPorPagina,
+  );
 
   const navigate = useNavigate();
   const [editando, setEditando] = useModoEdicao();
@@ -262,85 +286,158 @@ export default function CategoriasPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#b3daff]">
+    <div className="min-h-screen bg-[#F8F5F3]">
       <HeaderPerfil
         perfil={perfil}
         onMenuClick={handleMenuClick}
         itemEdicao="Editar categorias"
       />
 
-      <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+      <main className="mx-auto w-full max-w-6xl px-5 pb-16 pt-8 font-['Poppins'] sm:px-8 sm:pt-10">
+        <button
+          type="button"
+          onClick={() => navigate("/meus-perfis")}
+          className="mb-5 text-sm font-semibold text-[#365FB3] hover:underline"
+        >
+          ‹ Trocar perfil
+        </button>
+
+        <h1 className="mb-7 text-3xl font-bold text-[#1F3F80] sm:text-4xl">
+          Comunicação
+        </h1>
+
         {editando && (
           <BarraEdicao
-            texto="Toque na categoria que quer editar. Para editar botões, entre na categoria e use o menu."
+            texto="Toque na categoria que deseja editar."
             onConcluir={() => setEditando(false)}
           />
         )}
 
         {!editando && favoritos.length > 0 && (
-          <>
-            <TituloSecao
-              titulo="Favoritos"
-              subtitulo="Os botões que você mais usa"
-            />
+          <section
+            aria-labelledby="titulo-favoritos"
+            className="mb-10 rounded-3xl bg-[#CFE5F5] p-5 sm:p-6"
+          >
+            <h2
+              id="titulo-favoritos"
+              className="mb-5 text-xl font-bold text-[#1F3F80]"
+            >
+              Botões favoritos
+            </h2>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 mb-10">
-              {favoritos.map((botao) => (
-                <BotaoFala
-                  key={botao.id}
-                  botao={botao}
-                  perfilId={perfilId}
-                  onClick={reproduzirFavorito}
-                />
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => moverCarrossel(-1)}
+                aria-label="Ver favoritos anteriores"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-2xl font-semibold text-[#365FB3] shadow-sm transition hover:bg-[#EAF1FF]"
+              >
+                ‹
+              </button>
+
+              <div
+                ref={carrosselRef}
+                className="flex min-w-0 flex-1 snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth"
+                style={{ scrollbarWidth: "none" }}
+              >
+                {favoritos.map((botao) => (
+                  <div
+                    key={botao.id}
+                    className="min-w-0 shrink-0 basis-[calc((100%-1rem)/2)] snap-start sm:basis-[calc((100%-2rem)/3)] lg:basis-[calc((100%-3rem)/4)]"
+                  >
+                    <BotaoFala
+                      botao={botao}
+                      perfilId={perfilId}
+                      onClick={reproduzirFavorito}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => moverCarrossel(1)}
+                aria-label="Ver próximos favoritos"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-2xl font-semibold text-[#365FB3] shadow-sm transition hover:bg-[#EAF1FF]"
+              >
+                ›
+              </button>
+            </div>
+          </section>
+        )}
+
+        <section aria-labelledby="titulo-categorias">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <h2
+              id="titulo-categorias"
+              className="text-2xl font-bold text-[#1F3F80]"
+            >
+              Categorias
+            </h2>
+
+            {totalPaginas > 1 && (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-[#1F3F80]">
+                  Página {paginaAtual} de {totalPaginas}
+                </span>
+
+                <button
+                  type="button"
+                  disabled={paginaAtual === 1}
+                  onClick={() => setPagina(paginaAtual - 1)}
+                  className="rounded-xl border border-[#365FB3]/40 bg-white px-4 py-2 text-sm font-semibold text-[#365FB3] disabled:opacity-40"
+                >
+                  Anterior
+                </button>
+
+                <button
+                  type="button"
+                  disabled={paginaAtual === totalPaginas}
+                  onClick={() => setPagina(paginaAtual + 1)}
+                  className="rounded-xl bg-[#365FB3] px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+                >
+                  Próxima ›
+                </button>
+              </div>
+            )}
+          </div>
+
+          {categorias.length > 0 ? (
+            <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-7">
+              {categoriasVisiveis.map((categoria) => (
+                <div key={categoria.id} className="relative">
+                  <CategoriaCard
+                    categoria={categoria}
+                    onClick={handleCategoriaClick}
+                    editando={editando}
+                  />
+
+                  {editando && categoria.padrao && categoria.personalizado && (
+                    <AcaoRestaurar
+                      nome={categoria.nome}
+                      onClick={() => restaurarCategoria(categoria)}
+                    />
+                  )}
+
+                  {editando && !categoria.padrao && (
+                    <AcaoExcluir
+                      nome={categoria.nome}
+                      onClick={() => {
+                        setErroExclusao("");
+                        setCategoriaParaExcluir(categoria);
+                      }}
+                    />
+                  )}
+                </div>
               ))}
             </div>
-          </>
-        )}
-
-        <TituloSecao
-          titulo="Categorias"
-          subtitulo={
-            editando
-              ? "Escolha a categoria que você quer alterar"
-              : "Toque em uma categoria para ver os botões"
-          }
-        />
-
-        {categorias.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
-            {categorias.map((categoria) => (
-              <div key={categoria.id} className="relative">
-                <CategoriaCard
-                  categoria={categoria}
-                  onClick={handleCategoriaClick}
-                  editando={editando}
-                />
-
-                {editando && categoria.padrao && categoria.personalizado && (
-                  <AcaoRestaurar
-                    nome={categoria.nome}
-                    onClick={() => restaurarCategoria(categoria)}
-                  />
-                )}
-
-                {editando && !categoria.padrao && (
-                  <AcaoExcluir
-                    nome={categoria.nome}
-                    onClick={() => {
-                      setErroExclusao("");
-                      setCategoriaParaExcluir(categoria);
-                    }}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-blue-900 text-lg mt-12">
-            Nenhuma categoria encontrada.
-          </p>
-        )}
-      </div>
+          ) : (
+            <p className="py-12 text-center text-[#1F3F80]">
+              Nenhuma categoria encontrada.
+            </p>
+          )}
+        </section>
+      </main>
 
       <ConfirmModal
         aberto={!!categoriaParaExcluir}
@@ -382,26 +479,21 @@ function CategoriaCard({ categoria, onClick, editando }) {
       aria-label={
         editando ? `Editar categoria ${categoria.nome}` : categoria.nome
       }
-      className="relative w-full text-left bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-transform hover:scale-105 aspect-square flex flex-col"
+      className="group flex w-full flex-col items-center gap-3 text-center"
     >
-      <div className="flex-1 min-h-0 p-2 sm:p-3">
+      <div className="relative flex aspect-[5/3] w-full items-center justify-center overflow-hidden rounded-2xl border-2 border-[#365FB3]/25 bg-white p-4 transition hover:border-[#365FB3] hover:shadow-md">
         <img
           src={categoria.urlImagem}
-          alt={categoria.nome}
-          className="w-full h-full object-contain"
-          onError={(e) => {
-            e.target.src = "https://via.placeholder.com/200?text=Sem+Imagem";
-          }}
+          alt=""
+          className="h-full w-full object-contain"
         />
+
+        {editando && <SeloEditar />}
       </div>
 
-      <div className="p-2 sm:p-3 text-center">
-        <h3 className="font-bold text-xs sm:text-sm text-blue-900 truncate">
-          {categoria.nome}
-        </h3>
-      </div>
-
-      {editando && <SeloEditar />}
+      <span className="text-sm font-semibold text-[#1F3F80] sm:text-base">
+        {categoria.nome}
+      </span>
     </button>
   );
 }

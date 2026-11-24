@@ -15,7 +15,7 @@ export function Spinner({ tamanho = 20, className = "" }) {
 // Tela inteira de carregamento, usada enquanto a página busca os dados.
 export default function TelaCarregando({ texto = "Carregando..." }) {
   return (
-    <div className="min-h-screen bg-[#b3daff] flex flex-col items-center justify-center gap-6 p-4">
+    <div className="min-h-screen bg-[#CFE5F5] flex flex-col items-center justify-center gap-6 p-4">
       <div className="relative w-28 h-28 flex items-center justify-center">
         <Spinner tamanho={112} className="absolute inset-0 text-[#004687]" />
         <img
@@ -24,7 +24,7 @@ export default function TelaCarregando({ texto = "Carregando..." }) {
           className="w-20 h-20 rounded-full object-cover"
         />
       </div>
-      <p className="text-lg font-semibold text-[#004687]">{texto}</p>
+      <p className="text-lg font-semibold text-[#1F3F80]">{texto}</p>
     </div>
   );
 }

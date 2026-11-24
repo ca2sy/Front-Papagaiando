@@ -30,7 +30,9 @@ function paraLista(dados) {
 export default function MeusPerfis() {
   // Mostra na hora os perfis já salvos e atualiza em segundo plano
   const [perfis, setPerfis] = useState(() => paraLista(lerCache("perfis")));
-  const [loading, setLoading] = useState(() => !Array.isArray(lerCache("perfis")));
+  const [loading, setLoading] = useState(
+    () => !Array.isArray(lerCache("perfis")),
+  );
   const [perfilParaExcluir, setPerfilParaExcluir] = useState(null);
   const [excluindo, setExcluindo] = useState(false);
   const [erroExclusao, setErroExclusao] = useState("");
@@ -61,7 +63,7 @@ export default function MeusPerfis() {
         } else {
           const mensagem = await getApiError(
             response,
-            "Não foi possível carregar os perfis."
+            "Não foi possível carregar os perfis.",
           );
 
           console.error("Erro ao buscar perfis:", mensagem);
@@ -108,17 +110,17 @@ export default function MeusPerfis() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
         throw new Error(
-          await getApiError(response, "Não foi possível excluir o perfil.")
+          await getApiError(response, "Não foi possível excluir o perfil."),
         );
       }
 
       setPerfis((anteriores) =>
-        anteriores.filter((perfil) => perfil.id !== perfilParaExcluir.id)
+        anteriores.filter((perfil) => perfil.id !== perfilParaExcluir.id),
       );
       apagarFavoritosDoPerfil(perfilParaExcluir.id);
       if (perfis.length <= 1) setGerenciando(false);
@@ -158,143 +160,158 @@ export default function MeusPerfis() {
   }
 
   return (
-    <div className="min-h-screen bg-[#b3daff] flex flex-col">
-      <header className="bg-[#004687] shadow-md">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 sm:px-6 py-3">
-          <div className="flex items-center min-w-0">
+    <div className="min-h-screen bg-[#f8f5f3] font-['Poppins'] text-[#1f3f80]">
+      {/* Cabeçalho */}
+      <header className="bg-[#365FB3] shadow-sm">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
+          <div className="flex items-center gap-3">
             <img
               src={papagaiandoImg}
               alt=""
-              className="h-10 w-10 rounded-full object-cover ring-2 ring-white/40"
+              className="h-11 w-11 rounded-xl object-cover"
             />
-            <span className="ml-2 text-xl sm:text-2xl font-bold text-white truncate">
+            <span className="fonte-marca text-xl font-bold text-white sm:text-2xl">
               Papagaiando
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3 sm:gap-5">
+            <span className="hidden text-sm font-medium text-white sm:block">
+              Perfis
+            </span>
             <button
-              onClick={() => navigate("/minha-conta")}
-              className="flex items-center gap-2 rounded-full bg-white px-3 sm:px-4 py-2 font-semibold text-[#004687] shadow hover:bg-[#e6f3ff] transition"
-            >
-              <FiUser size={20} aria-hidden="true" />
-              <span className="hidden sm:inline">Minha conta</span>
-            </button>
-            <button
+              type="button"
               onClick={() => {
                 sairDaConta();
                 navigate("/", { replace: true });
               }}
+              className="rounded-lg p-2 text-white hover:bg-white/15"
               aria-label="Sair da conta"
-              className="flex items-center gap-2 rounded-full px-3 sm:px-4 py-2 font-semibold text-white ring-1 ring-white/50 hover:bg-white/10 transition"
+              title="Sair da conta"
             >
-              <FiLogOut size={20} aria-hidden="true" />
-              <span className="hidden sm:inline">Sair</span>
+              <FiLogOut size={20} />
             </button>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center px-4 sm:px-6 py-10 sm:py-16">
-        <div className="text-center mb-10 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#004687] mb-2">
-            {gerenciando ? "Gerenciar perfis" : "Quem está usando?"}
+      <main className="mx-auto flex min-h-[calc(100dvh-64px)] w-full max-w-6xl flex-col px-5 pb-8 pt-8 sm:px-8">
+        {/* Voltar para a conta */}
+        <button
+          type="button"
+          onClick={() => navigate("/minha-conta")}
+          className="mb-7 mt-7 self-start text-sm font-semibold text-[#2a5bbd] hover:underline"
+        >
+          ‹ Minha conta
+        </button>
+
+        {/* Título */}
+        <div className="mb-2 mt-auto">
+          <h1 className="mb-2 text-3xl font-bold text-[#1f3f80] sm:text-4xl">
+            {gerenciando ? "Gerenciar perfis" : "Quem vai se comunicar?"}
           </h1>
-          <p className="text-[#004687]/75 text-base sm:text-lg">{subtitulo}</p>
+          <p className="text-sm text-[#607b92] sm:text-base">
+            {gerenciando
+              ? "Selecione um perfil para editar ou excluir."
+              : perfis.length === 0
+                ? "Crie o primeiro perfil para começar."
+                : "Escolha um perfil para abrir seus favoritos e categorias."}
+          </p>
         </div>
 
-        <ul className="flex w-full max-w-4xl flex-wrap justify-center gap-6 sm:gap-10">
+        {/* Cartões de perfis */}
+        <ul className="mb-auto grid w-full grid-cols-1 justify-center gap-5 py-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
           {perfis.map((perfil) => (
-            <li key={perfil.id} className="relative w-[calc(50%-0.75rem)] sm:w-40">
+            <li
+              key={perfil.id}
+              className="flex min-h-64 lg:min-h-[clamp(16rem,38dvh,22rem)] flex-col items-center justify-between rounded-3xl border-2 border-[#365FB3]/15 bg-white px-5 py-7 transition hover:border-[#365FB3] hover:shadow-md"
+            >
               <button
                 type="button"
                 onClick={() => abrirPerfil(perfil)}
+                className="flex w-full flex-1 flex-col items-center justify-center gap-4 rounded-xl focus:outline-none focus-visible:ring-4 focus-visible:ring-[#365FB3]/25"
                 aria-label={
                   gerenciando
                     ? `Editar perfil ${perfil.nome}`
                     : `Entrar no perfil ${perfil.nome}`
                 }
-                className="group flex w-full flex-col items-center rounded-2xl p-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#004687]/40"
               >
-                <div className="relative mb-3 transition duration-200 group-hover:-translate-y-1">
-                  <Avatar perfil={perfil} />
-                  {gerenciando && (
-                    <span className="absolute inset-0 flex items-center justify-center rounded-full bg-[#004687]/55 text-white">
-                      <FiEdit2 size={32} aria-hidden="true" />
-                    </span>
-                  )}
-                </div>
-                <p className="w-full truncate text-center text-lg sm:text-xl font-semibold text-[#004687] group-hover:text-[#003366]">
+                <Avatar perfil={perfil} />
+
+                <span className="max-w-full truncate text-center text-xl font-semibold text-[#1f3f80]">
                   {perfil.nome}
-                </p>
+                </span>
               </button>
 
-              {gerenciando && (
+              <div className="mt-4 flex items-center justify-center gap-5">
                 <button
                   type="button"
-                  onClick={() => pedirExclusao(perfil)}
-                  aria-label={`Excluir perfil ${perfil.nome}`}
-                  className="aviso-entrada absolute top-1 left-1/2 translate-x-4 sm:top-2 sm:translate-x-7 flex h-11 w-11 items-center justify-center rounded-full border-2 border-white bg-red-600 text-white shadow-lg hover:bg-red-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-red-300"
+                  onClick={() => navigate(`/editar-perfil/${perfil.id}`)}
+                  className="text-sm font-semibold text-[#365FB3] hover:underline"
                 >
-                  <FiTrash2 size={20} aria-hidden="true" />
+                  Editar perfil
                 </button>
-              )}
 
+                {gerenciando && (
+                  <button
+                    type="button"
+                    onClick={() => pedirExclusao(perfil)}
+                    className="flex items-center gap-1 text-sm font-semibold text-red-600 hover:underline"
+                    aria-label={`Excluir perfil ${perfil.nome}`}
+                  >
+                    <FiTrash2 size={16} />
+                    Excluir
+                  </button>
+                )}
+              </div>
             </li>
           ))}
 
+          {/* Criar novo perfil */}
           {podeAdicionar && !gerenciando && (
-            <li className="w-[calc(50%-0.75rem)] sm:w-40">
+            <li>
               <button
                 type="button"
                 onClick={() => navigate("/criar-perfil")}
-                className="group flex w-full flex-col items-center rounded-2xl p-2 text-[#004687] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#004687]/40"
+                className="flex min-h-64 lg:min-h-[clamp(16rem,38dvh,22rem)] w-full flex-col items-center justify-center gap-8 rounded-3xl border border-[#9dc3dd] bg-[#cfe5f5] px-5 py-7 text-[#365FB3] transition hover:border-[#365FB3] hover:bg-[#bedef3] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#365FB3]/25"
               >
-                <span className="mb-3 flex h-28 w-28 sm:h-36 sm:w-36 items-center justify-center rounded-full border-[3px] border-dashed border-[#004687]/50 bg-white/40 transition duration-200 group-hover:-translate-y-1 group-hover:border-[#004687] group-hover:bg-white">
-                  <FiPlus size={44} aria-hidden="true" />
-                </span>
-                <span className="text-lg sm:text-xl font-semibold">Novo perfil</span>
+                <FiPlus size={52} strokeWidth={1.8} aria-hidden="true" />
+                <span className="text-xl font-semibold">Criar perfil</span>
               </button>
             </li>
           )}
         </ul>
 
+        {/* Gerenciamento dos perfis */}
         {perfis.length > 0 && (
-          <div className="mt-10 flex flex-col items-center gap-3">
+          <div className="mt-12 flex flex-wrap items-center justify-between gap-4">
+            <p className="text-sm text-[#607b92]">
+              {perfis.length} de {LIMITE_PERFIS} perfis
+            </p>
+
             <button
               type="button"
               onClick={() => setGerenciando((atual) => !atual)}
-              className={`inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold shadow transition focus:outline-none focus-visible:ring-4 focus-visible:ring-[#004687]/40 ${
-                gerenciando
-                  ? "bg-[#004687] text-white hover:bg-[#003366]"
-                  : "bg-white text-[#004687] hover:bg-[#e6f3ff]"
-              }`}
+              className="inline-flex items-center gap-2 rounded-xl border border-[#365FB3]/30 bg-white px-4 py-2 text-sm font-semibold text-[#365FB3] transition hover:bg-[#e2effa]"
             >
-              {gerenciando ? (
-                <FiCheck size={20} aria-hidden="true" />
-              ) : (
-                <FiSettings size={20} aria-hidden="true" />
-              )}
-              <span>{gerenciando ? "Concluído" : "Gerenciar perfis"}</span>
+              {gerenciando ? <FiCheck size={18} /> : <FiSettings size={18} />}
+              {gerenciando ? "Concluir" : "Gerenciar perfis"}
             </button>
-            <p className="text-sm text-[#004687]/70">
-              {perfis.length} de {LIMITE_PERFIS} perfis
-            </p>
           </div>
         )}
       </main>
 
+      {/* Confirmação de exclusão */}
       <ConfirmModal
         aberto={!!perfilParaExcluir}
         titulo="Excluir perfil?"
         mensagem={
           <>
-            O perfil <strong>{perfilParaExcluir?.nome}</strong> e todos os
-            botões e categorias dele serão apagados para sempre. Essa ação não
-            pode ser desfeita.
+            O perfil <strong>{perfilParaExcluir?.nome}</strong> e todos os seus
+            dados serão excluídos. Esta ação não pode ser desfeita.
           </>
         }
-        textoConfirmar={excluindo ? "Excluindo..." : "Sim, excluir"}
+        textoConfirmar="Sim, excluir"
         perigo
         carregando={excluindo}
         erro={erroExclusao}
@@ -312,12 +329,12 @@ export default function MeusPerfis() {
 function Avatar({ perfil }) {
   const [falhou, setFalhou] = useState(false);
   const classes =
-    "h-28 w-28 sm:h-36 sm:w-36 rounded-full border-4 border-white shadow-lg transition group-hover:border-[#004687] group-hover:shadow-xl";
+    "h-24 w-24 rounded-full object-cover transition group-hover:scale-105";
 
   if (!perfil.urlFoto || falhou) {
     return (
       <div
-        className={`${classes} flex items-center justify-center bg-[#004687] text-4xl font-extrabold text-white`}
+        className={`${classes} flex items-center justify-center bg-[#cfe5f5] text-4xl font-bold text-[#365FB3]`}
         aria-hidden="true"
       >
         {perfil.nome?.trim()?.[0]?.toUpperCase() || "?"}
