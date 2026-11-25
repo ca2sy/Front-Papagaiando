@@ -8,6 +8,8 @@ import { useVoltar } from "../../services/navegacao";
 
 import { Spinner } from "../../components/Carregando";
 
+import papagaiandoImg from "../../assets/papagaiando.jpg";
+
 export default function CriarPerfil() {
   const [nome, setNome] = useState("");
   const [fotoSelecionada, setFotoSelecionada] = useState(null);
@@ -86,54 +88,136 @@ export default function CriarPerfil() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#b3daff] p-4">
-      <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-white border-2 border-white/30">
-        <div className="mb-6">
-          <BotaoVoltar onClick={voltar} />
-          <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">
-            Criar Perfil
-          </h1>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <input
-            type="text"
-            placeholder="Nome do perfil"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#004687] focus:outline-none focus:ring-2 focus:ring-white bg-white border-2 border-[#004687]"
-            required
-          />
-
-          <p className="text-[#004687] font-semibold mt-2">
-            Escolha uma imagem de perfil:
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center mt-2">
-            {imagensPapagaiando.map((img, idx) => (
-              <img
-                key={idx}
-                src={img.url}
-                alt={img.nome}
-                className={`w-24 h-24 rounded-xl cursor-pointer border-2 transition-transform transform hover:scale-105 ${
-                  fotoSelecionada === img.url
-                    ? "border-[#004687]"
-                    : "border-[#004687]/50"
-                }`}
-                onClick={() => setFotoSelecionada(img.url)}
-              />
-            ))}
+    <div className="min-h-screen bg-[#F8F5F3]">
+      <header className="bg-[#365FB3] text-white">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 sm:px-8">
+          <div className="flex items-center gap-3">
+            <img
+              src={papagaiandoImg}
+              alt=""
+              className="h-11 w-11 rounded-xl object-cover"
+            />
+            <span className="text-xl font-bold">Papagaiando</span>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg mt-4 text-white disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {loading && <Spinner tamanho={18} />}
-            <span>{loading ? "Criando..." : "Criar Perfil"}</span>
-          </button>
+          <span className="text-sm font-medium">Área do responsável</span>
+        </div>
+      </header>
+
+      <main className="mx-auto w-full max-w-6xl px-5 pb-12 pt-8 sm:px-8 sm:pt-10">
+        <button
+          type="button"
+          onClick={voltar}
+          className="mb-5 text-sm font-semibold text-[#365FB3] hover:underline"
+        >
+          ‹ Gerenciar perfis
+        </button>
+
+        <h1 className="mb-8 text-3xl font-bold text-[#1F3F80] sm:text-4xl">
+          Criar perfil
+        </h1>
+
+        <form
+          onSubmit={handleSubmit}
+          className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(280px,1fr)]"
+        >
+          <section className="flex flex-col rounded-3xl bg-white p-6 sm:p-8">
+            <div>
+              <label
+                htmlFor="nome-perfil"
+                className="mb-2 block font-semibold text-[#1F3F80]"
+              >
+                Nome do perfil
+              </label>
+
+              <input
+                id="nome-perfil"
+                type="text"
+                placeholder="Digite o nome do perfil"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                disabled={loading}
+                required
+                className="w-full rounded-xl border border-[#A8BED6] bg-white px-4 py-3 text-[#1F3F80] outline-none focus:border-[#365FB3] focus:ring-2 focus:ring-[#365FB3]/20"
+              />
+            </div>
+
+            <div className="mt-7">
+              <p className="mb-4 font-semibold text-[#1F3F80]">
+                Escolha uma imagem de perfil
+              </p>
+
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                {imagensPapagaiando.map((img) => (
+                  <button
+                    key={img.nome}
+                    type="button"
+                    onClick={() => setFotoSelecionada(img.url)}
+                    disabled={loading}
+                    aria-label={`Selecionar papagaio ${img.nome}`}
+                    aria-pressed={fotoSelecionada === img.url}
+                    className={`flex aspect-square items-center justify-center rounded-2xl border-2 bg-[#F8F5F3] p-2 transition hover:border-[#365FB3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#365FB3] ${
+                      fotoSelecionada === img.url
+                        ? "border-[#365FB3] ring-2 ring-[#365FB3]/20"
+                        : "border-[#D8E2EC]"
+                    }`}
+                  >
+                    <img
+                      src={img.url}
+                      alt=""
+                      className="h-full w-full rounded-xl object-contain"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-auto flex flex-wrap gap-3 pt-10">
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex min-w-[170px] items-center justify-center gap-2 rounded-xl bg-[#365FB3] px-6 py-3 font-semibold text-white transition hover:bg-[#1F3F80] disabled:opacity-60"
+              >
+                {loading && <Spinner tamanho={18} />}
+                {loading ? "Criando..." : "Criar perfil"}
+              </button>
+
+              <button
+                type="button"
+                onClick={voltar}
+                disabled={loading}
+                className="rounded-xl border border-[#A8BED6] bg-white px-6 py-3 font-semibold text-[#365FB3] transition hover:bg-[#F8F5F3] disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+            </div>
+          </section>
+
+          <aside className="flex flex-col rounded-3xl bg-[#CFE5F5] p-6 sm:p-8">
+            <h2 className="text-xl font-bold text-[#1F3F80]">Prévia</h2>
+
+            <div className="flex flex-1 flex-col items-center justify-center gap-4 py-8">
+              <div className="flex h-40 w-40 items-center justify-center overflow-hidden rounded-2xl border border-[#A8BED6] bg-white p-4 sm:h-48 sm:w-48">
+                {fotoSelecionada ? (
+                  <img
+                    src={fotoSelecionada}
+                    alt="Imagem selecionada para o perfil"
+                    className="h-full w-full object-contain"
+                  />
+                ) : (
+                  <span className="text-center text-sm text-[#617A98]">
+                    Selecione uma imagem
+                  </span>
+                )}
+              </div>
+
+              <p className="break-words text-center text-lg font-semibold text-[#1F3F80]">
+                {nome.trim() || "Nome do perfil"}
+              </p>
+            </div>
+          </aside>
         </form>
-      </div>
+      </main>
     </div>
   );
 }

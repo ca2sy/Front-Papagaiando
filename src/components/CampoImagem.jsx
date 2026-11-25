@@ -13,6 +13,7 @@ export default function CampoImagem({
   onArquivoChange,
   onErro,
   disabled = false,
+  mostrarPrevia = true,
 }) {
   const id = useId();
   const [modo, setModo] = useState("arquivo");
@@ -60,27 +61,28 @@ export default function CampoImagem({
       <p className="block text-[#004687] font-medium mb-2">{rotulo}</p>
 
       {/* Prévia da imagem que será salva */}
-      <div className="mb-3 flex h-36 items-center justify-center rounded-xl border-2 border-dashed border-[#004687]/30 bg-[#b3daff]/20 p-2">
-        {preview && !(linkQuebrado && !previewArquivo) ? (
-          <img
-            src={preview}
-            alt="Prévia"
-            onError={() => setLinkQuebrado(true)}
-            onLoad={() => setLinkQuebrado(false)}
-            className="h-full w-full object-contain"
-          />
-        ) : (
-          <div className="text-center text-[#004687]/60">
-            <FiImage size={32} className="mx-auto mb-1" />
-            <p className="text-sm">
-              {linkQuebrado
-                ? "Não foi possível abrir esse link"
-                : "Nenhuma imagem escolhida"}
-            </p>
-          </div>
-        )}
-      </div>
-
+      {mostrarPrevia && (
+        <div className="mb-3 flex h-36 items-center justify-center rounded-xl border-2 border-dashed border-[#004687]/30 bg-[#b3daff]/20 p-2">
+          {preview && !(linkQuebrado && !previewArquivo) ? (
+            <img
+              src={preview}
+              alt="Prévia"
+              onError={() => setLinkQuebrado(true)}
+              onLoad={() => setLinkQuebrado(false)}
+              className="h-full w-full object-contain"
+            />
+          ) : (
+            <div className="text-center text-[#004687]/60">
+              <FiImage size={32} className="mx-auto mb-1" />
+              <p className="text-sm">
+                {linkQuebrado
+                  ? "Não foi possível abrir esse link"
+                  : "Nenhuma imagem escolhida"}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
       <div
         role="tablist"
         className="mb-3 flex gap-1 rounded-xl bg-[#b3daff]/40 p-1"

@@ -120,26 +120,26 @@ export default function CampoAudio({
   const abaClasse = (ativa) =>
     `flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
       ativa
-        ? "bg-white text-[#004687] shadow"
-        : "text-[#004687]/70 hover:text-[#004687]"
+        ? "bg-white text-[#365FB3] shadow"
+        : "text-[#365FB3]/70 hover:text-[#365FB3]"
     }`;
 
   return (
     <div>
-      <p className="block text-[#004687] font-medium mb-2">{rotulo}</p>
+      <p className="block text-[#365FB3] font-medium mb-2">{rotulo}</p>
 
       {/* Prévia do áudio que será salvo */}
-      <div className="mb-3 rounded-xl border-2 border-dashed border-[#004687]/30 bg-[#b3daff]/20 p-3">
+      <div className="mb-3 rounded-xl border-2 border-dashed border-[#365FB3]/30 bg-[#CFE5F5]/20 p-3">
         {preview ? (
           <>
-            <p className="mb-2 flex items-center gap-2 text-xs font-semibold text-[#004687]/80">
+            <p className="mb-2 flex items-center gap-2 text-xs font-semibold text-[#365FB3]/80">
               <FiVolume2 aria-hidden="true" />
               {previewGravacao ? "Nova gravação" : "Áudio atual"}
             </p>
             <audio key={preview} controls src={preview} className="w-full" />
           </>
         ) : (
-          <p className="py-3 text-center text-sm text-[#004687]/60">
+          <p className="py-3 text-center text-sm text-[#365FB3]/60">
             Nenhum áudio escolhido
           </p>
         )}
@@ -147,7 +147,7 @@ export default function CampoAudio({
 
       <div
         role="tablist"
-        className="mb-3 flex gap-1 rounded-xl bg-[#b3daff]/40 p-1"
+        className="mb-3 flex gap-1 rounded-xl bg-[#CFE5F5]/40 p-1"
       >
         <button
           type="button"
@@ -196,13 +196,13 @@ export default function CampoAudio({
               type="button"
               onClick={iniciarGravacao}
               disabled={disabled}
-              className="flex w-full flex-col items-center gap-1 rounded-xl border-2 border-[#004687] px-4 py-4 text-[#004687] transition hover:bg-blue-50 disabled:opacity-50"
+              className="flex w-full flex-col items-center gap-1 rounded-xl border-2 border-[#365FB3] px-4 py-4 text-[#365FB3] transition hover:bg-blue-50 disabled:opacity-50"
             >
               <FiMic size={26} aria-hidden="true" />
               <span className="font-semibold">
                 {gravacao ? "Gravar de novo" : "Começar a gravar"}
               </span>
-              <span className="text-xs text-[#004687]/70">
+              <span className="text-xs text-[#365FB3]/70">
                 Fale perto do microfone
               </span>
             </button>
@@ -232,9 +232,9 @@ export default function CampoAudio({
             disabled={disabled}
             placeholder="https://exemplo.com/audio.mp3"
             aria-label="Link do áudio"
-            className="w-full rounded-lg border-2 border-[#004687] p-3 text-[#004687] placeholder-[#004687]/40 focus:outline-none focus:ring-2 focus:ring-[#004687]"
+            className="w-full rounded-lg border-2 border-[#365FB3] p-3 text-[#365FB3] placeholder-[#365FB3]/40 focus:outline-none focus:ring-2 focus:ring-[#365FB3]"
           />
-          <p className="mt-1 text-xs text-[#004687]/70">
+          <p className="mt-1 text-xs text-[#365FB3]/70">
             Cole o endereço de um áudio da internet (MP3, WAV, OGG...).
           </p>
         </div>

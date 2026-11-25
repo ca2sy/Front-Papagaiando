@@ -5,6 +5,7 @@ import { API_BASE_URL, getApiError } from "../../services/api";
 import { Spinner } from "../../components/Carregando";
 import BotaoVoltar from "../../components/BotaoVoltar";
 import { useVoltar } from "../../services/navegacao";
+import papagaiandoImg from "../../assets/papagaiando.jpg";
 
 export default function CriarCategoria() {
   const [nome, setNome] = useState("");
@@ -117,122 +118,187 @@ export default function CriarCategoria() {
   };
 
   return (
-    <div className="min-h-screen bg-[#b3daff] p-4">
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="bg-[#ffffff] backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-md text-[#004687] border-2 border-white/30">
-          <div className="mb-6">
-            <BotaoVoltar onClick={handleVoltar} disabled={loading} />
-            <h1 className="mt-4 text-3xl font-extrabold text-center text-[#004687]">
-              Criar Categoria
-            </h1>
+    <div className="min-h-screen bg-[#F8F5F3]">
+      <header className="bg-[#365FB3] text-white">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 sm:px-8">
+          <div className="flex items-center gap-3">
+            <img
+              src={papagaiandoImg}
+              alt=""
+              className="h-11 w-11 rounded-xl object-cover"
+            />
+            <span className="text-xl font-bold">Papagaiando</span>
           </div>
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <span className="text-sm font-medium">Área do responsável</span>
+        </div>
+      </header>
+
+      <main className="mx-auto w-full max-w-6xl px-5 pb-12 pt-8 sm:px-8 sm:pt-10">
+        <button
+          type="button"
+          onClick={handleVoltar}
+          disabled={loading}
+          className="mb-5 text-sm font-semibold text-[#365FB3] hover:underline disabled:opacity-60"
+        >
+          ‹ Gerenciar categorias
+        </button>
+
+        <h1 className="mb-8 text-3xl font-bold text-[#1F3F80] sm:text-4xl">
+          Criar categoria
+        </h1>
+
+        <form
+          onSubmit={handleSubmit}
+          className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(280px,1fr)]"
+        >
+          <section className="flex flex-col rounded-3xl bg-white p-6 sm:p-8">
             <div>
-              <label className="block text-base font-medium mb-2 text-[#004687]">
-                Nome da Categoria
+              <label
+                htmlFor="nome-categoria"
+                className="mb-2 block font-semibold text-[#1F3F80]"
+              >
+                Nome da categoria
               </label>
               <input
+                id="nome-categoria"
                 type="text"
-                placeholder="Ex: Animais, Cores, etc."
+                placeholder="Ex.: Animais, Cores, Alimentação..."
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg text-[#004687] placeholder-[#004687] border-2 border-[#004687] focus:outline-none focus:ring-2 focus:ring-white bg-white"
                 disabled={loading}
                 required
+                className="w-full rounded-xl border border-[#A8BED6] bg-white px-4 py-3 text-[#1F3F80] outline-none focus:border-[#365FB3] focus:ring-2 focus:ring-[#365FB3]/20"
               />
             </div>
 
-            <div>
-              <label className="block text-base font-medium mb-2 text-[#004687]">
-                Imagem da Categoria
+            <div className="mt-7">
+              <p className="mb-3 font-semibold text-[#1F3F80]">
+                Imagem da categoria
+              </p>
+
+              <input
+                id="imagem-input"
+                type="file"
+                accept="image/*"
+                onChange={handleImagemChange}
+                disabled={loading}
+                className="sr-only"
+              />
+
+              <label
+                htmlFor="imagem-input"
+                className={`flex min-h-36 flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-[#A8BED6] bg-[#F8F5F3] p-5 text-center transition hover:border-[#365FB3] ${
+                  loading ? "pointer-events-none opacity-60" : "cursor-pointer"
+                }`}
+              >
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#365FB3"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M12 16V4m0 0L7 9m5-5 5 5" />
+                  <path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3" />
+                </svg>
+
+                <span className="font-semibold text-[#365FB3]">
+                  {imagemSelecionada
+                    ? "Trocar imagem"
+                    : "Escolher imagem do dispositivo"}
+                </span>
+
+                <span className="max-w-full break-all text-sm text-[#617A98]">
+                  {imagemSelecionada
+                    ? imagemSelecionada.name
+                    : "PNG, JPG ou GIF até 5 MB"}
+                </span>
               </label>
-              <div className="border-2 border-dashed border-[#004687] rounded-lg p-6 text-center cursor-pointer hover:border-white transition">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImagemChange}
-                  className="hidden"
-                  id="imagem-input"
-                  disabled={loading}
-                />
-                <label htmlFor="imagem-input" className="cursor-pointer block">
-                  {previewImagem ? (
-                    <div className="space-y-3">
-                      <img
-                        src={previewImagem}
-                        alt="Preview"
-                        className="w-32 h-32 object-contain rounded-lg mx-auto"
-                      />
-                      <p className="text-sm text-[#004687]/80">
-                        Clique para alterar imagem
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <svg
-                        className="mx-auto h-12 w-12 text-white/60"
-                        stroke="currentColor"
-                        fill="none"
-                        viewBox="0 0 48 48"
-                      >
-                        <path
-                          d="M28 8H12a4 4 0 00-4 4v20a4 4 0 004 4h24a4 4 0 004-4V16a4 4 0 00-4-4z"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <circle
-                          cx="20"
-                          cy="20"
-                          r="3"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M44 24l-8-8-16 16-8-8"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      <p className="text-sm font-medium">
-                        Clique para fazer upload da imagem
-                      </p>
-                      <p className="text-xs text-[#004687]/80">
-                        PNG, JPG, GIF até 5MB
-                      </p>
-                    </div>
-                  )}
-                </label>
-              </div>
             </div>
 
             {erro && (
-              <div className="bg-red-500/20 border border-red-400 text-white px-4 py-3 rounded-lg text-sm">
+              <p
+                role="alert"
+                className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              >
                 {erro}
-              </div>
+              </p>
             )}
 
             {sucesso && (
-              <div className="bg-green-500/20 border border-green-400 text-white px-4 py-3 rounded-lg text-sm">
+              <p
+                role="status"
+                className="mt-5 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"
+              >
                 Categoria criada com sucesso!
-              </div>
+              </p>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-[#004687] hover:bg-[#003366] transition font-semibold py-3 rounded-lg shadow-lg disabled:opacity-70 disabled:cursor-not-allowed text-white"
-            >
-              {loading && <Spinner tamanho={18} />}
-              <span>
-                {loading ? "Criando categoria..." : "Criar Categoria"}
-              </span>
-            </button>
-          </form>
-        </div>
-      </div>
+            <div className="mt-auto flex flex-wrap gap-3 pt-10">
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex min-w-[170px] items-center justify-center gap-2 rounded-xl bg-[#365FB3] px-6 py-3 font-semibold text-white transition hover:bg-[#1F3F80] disabled:opacity-60"
+              >
+                {loading && <Spinner tamanho={18} />}
+                {loading ? "Criando..." : "Criar categoria"}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleVoltar}
+                disabled={loading}
+                className="rounded-xl border border-[#A8BED6] bg-white px-6 py-3 font-semibold text-[#365FB3] transition hover:bg-[#F8F5F3] disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+            </div>
+          </section>
+
+          <aside className="flex flex-col rounded-3xl bg-[#CFE5F5] p-6 sm:p-8">
+            <h2 className="text-xl font-bold text-[#1F3F80]">Prévia</h2>
+
+            <div className="flex flex-1 flex-col items-center justify-center gap-4 py-8">
+              <div className="flex aspect-[5/4] w-full max-w-[250px] items-center justify-center overflow-hidden rounded-2xl border border-[#A8BED6] bg-white p-5">
+                {previewImagem ? (
+                  <img
+                    src={previewImagem}
+                    alt="Prévia da imagem da categoria"
+                    className="h-full w-full object-contain"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-center text-[#617A98]">
+                    <svg
+                      width="42"
+                      height="42"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <path d="m21 15-5-5L5 21" />
+                    </svg>
+                    <span className="text-sm">Nenhuma imagem selecionada</span>
+                  </div>
+                )}
+              </div>
+
+              <p className="max-w-full break-words text-center text-lg font-semibold text-[#1F3F80]">
+                {nome.trim() || "Nome da categoria"}
+              </p>
+            </div>
+          </aside>
+        </form>
+      </main>
     </div>
   );
 }
