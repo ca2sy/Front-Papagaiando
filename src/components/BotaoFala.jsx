@@ -39,7 +39,7 @@ export default function BotaoFala({
         <img
           src={botao.urlImagem}
           alt={botao.nome}
-          className="w-full h-full object-contain p-2"
+          className="h-full w-full object-contain p-4 sm:p-5"
           onError={(e) => {
             e.target.src = "https://via.placeholder.com/200?text=📻";
           }}

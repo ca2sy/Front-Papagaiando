@@ -27,6 +27,9 @@ import {
 
 export default function BotoesPage() {
   const { perfilId, categoriaId } = useParams();
+  useEffect(() => {
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+}, [perfilId, categoriaId]);
   const chaveBotoes = `botoes:${perfilId}:${categoriaId}`;
   const chavePerfil = `perfil:${perfilId}`;
 
@@ -283,49 +286,58 @@ export default function BotoesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#b3daff]">
+    <div className="min-h-screen bg-[#F8F5F3]">
       <HeaderPerfil
         perfil={perfil}
         onMenuClick={handleMenuClick}
         itemEdicao="Editar botões"
       />
 
-      <div className="p-4 sm:p-6 max-w-7xl mx-auto">
-        {editando && (
-          <BarraEdicao
-            texto="Toque no botão que quer editar."
-            onConcluir={() => setEditando(false)}
-          />
-        )}
-
-        {/* Cabeçalho */}
-        <div className="flex items-center justify-between gap-3 mb-6">
-          <BotaoVoltar onClick={handleVoltar} texto="Categorias" />
+      <main className="mx-auto w-full max-w-6xl px-5 pb-12 pt-8 sm:px-8 sm:pt-10">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+          <button
+            type="button"
+            onClick={handleVoltar}
+            className="text-sm font-semibold text-[#365FB3] hover:underline"
+          >
+            ‹ Categorias
+          </button>
 
           <button
+            type="button"
             onClick={() => handleMenuClick("criar-botao")}
-            className="inline-flex items-center gap-2 rounded-full bg-[#004687] px-4 py-2 font-semibold text-white shadow-md hover:bg-[#003366] transition"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#365FB3] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1F3F80]"
           >
-            <FiPlus size={20} aria-hidden="true" />
+            <FiPlus size={18} aria-hidden="true" />
             Novo botão
           </button>
         </div>
 
-        <TituloSecao
-          como="h1"
-          titulo={categoria?.nome || "Botões"}
-          subtitulo={
-            editando
-              ? "Escolha o botão que você quer alterar"
-              : "Toque em um botão para ouvir"
-          }
-        />
+        <div className="mb-8">
+          <h1 className="mb-2 text-3xl font-bold text-[#1F3F80] sm:text-4xl">
+            {categoria?.nome || "Botões"}
+          </h1>
 
-        {/* Grid de botões */}
+          <p className="text-base text-[#617A98]">
+            {editando
+              ? "Escolha o botão que deseja editar."
+              : "Toque na imagem para falar."}
+          </p>
+        </div>
+
+        {editando && (
+          <div className="mb-8">
+            <BarraEdicao
+              texto="Toque no botão que quer editar."
+              onConcluir={() => setEditando(false)}
+            />
+          </div>
+        )}
+
         {botoes.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:gap-x-7 lg:gap-y-10">
             {botoes.map((botao) => (
-              <div key={botao.id} className="relative">
+              <div key={botao.id} className="relative min-w-0">
                 <BotaoFala
                   botao={botao}
                   perfilId={perfilId}
@@ -354,20 +366,25 @@ export default function BotoesPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center mt-12">
-            <p className="text-blue-900 text-lg mb-4">
-              Nenhum botão encontrado nesta categoria.
+          <div className="rounded-3xl bg-[#CFE5F5] px-6 py-14 text-center">
+            <h2 className="mb-3 text-xl font-bold text-[#1F3F80]">
+              Ainda não há botões nesta categoria
+            </h2>
+
+            <p className="mb-6 text-[#617A98]">
+              Adicione um botão para começar a se comunicar.
             </p>
 
             <button
+              type="button"
               onClick={() => handleMenuClick("criar-botao")}
-              className="bg-blue-600 hover:bg-[#004687] text-white px-6 py-2 rounded-lg font-medium"
+              className="rounded-xl bg-[#365FB3] px-6 py-3 font-semibold text-white transition hover:bg-[#1F3F80]"
             >
-              Criar Primeiro Botão
+              Criar primeiro botão
             </button>
           </div>
         )}
-      </div>
+      </main>
 
       <ConfirmModal
         aberto={!!botaoParaExcluir}
